@@ -7,8 +7,8 @@ export default function Welcome({ onStartMission }) {
         <div className="hero-copy">
           <p className="eyebrow">Cyber Mission</p>
           <h1>
-            Cyber Breach
-            <span>8 Minutes to Contain</span>
+            Mission
+            <span>Cyber Breach</span>
           </h1>
           <p className="hero-text">
             A security incident is developing. Your decisions will determine what happens next.

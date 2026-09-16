@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import MissionHeader from "../../components/MissionHeader/MissionHeader.jsx";
 import MissionProgress from "../../components/MissionProgress/MissionProgress.jsx";
+import MissionTopBar from "../../components/MissionTopBar/MissionTopBar.jsx";
 import { useMission } from "../../context/MissionContext.jsx";
 import { useMissionTimer } from "../../hooks/useMissionTimer.js";
 import {
@@ -100,7 +100,7 @@ export default function Station01({ mission }) {
   if (station01?.timedOut || mission.status === "timed-out") {
     return (
       <main className="screen station-screen">
-        <MissionHeader mission={mission} />
+        <MissionTopBar mission={mission} stationLabel="Station 01 / 04" />
         <section className="station-timeout-card">
           <p className="eyebrow">Mission Time Expired</p>
           <h1>Your current mission session has ended.</h1>
@@ -112,8 +112,7 @@ export default function Station01({ mission }) {
 
   return (
     <main className="screen station-screen station01-screen">
-      <MissionHeader mission={mission} />
-      <MissionProgress currentStation={1} />
+      <MissionTopBar mission={mission} stationLabel="Station 01 / 04" />
 
       {processing && (
         <div className="decision-processing" role="status" aria-live="polite">
@@ -126,7 +125,19 @@ export default function Station01({ mission }) {
       {!processing && station01.completedAt && !browserVisible ? (
         <StationComplete mission={mission} />
       ) : (
-        <section className="station01-layout">
+        <section className="station01-layout" aria-label="Station 01 suspicious message investigation">
+          <aside className="station-brief-panel">
+            <p className="eyebrow">Station 01 / 04</p>
+            <h1>
+              Suspicious
+              <span>Message</span>
+            </h1>
+            <p>You've received a message. Take a closer look before you act.</p>
+            <div className="station01-progress">
+              <MissionProgress currentStation={1} />
+            </div>
+          </aside>
+
           <div className="phone-stage">
             <PhoneInterface
               scenario={scenario}
@@ -140,10 +151,8 @@ export default function Station01({ mission }) {
 
           <aside className="investigation-panel">
             <p className="eyebrow">Investigation Panel</p>
-            <h2>Review Before You Act</h2>
-            <p>
-              Inspect the sender, review message details, and examine destinations before committing your response.
-            </p>
+            <h2>Take a closer look</h2>
+            <p>Inspect the message before deciding what to do.</p>
 
             <div className="investigation-status-list">
               <div className={station01.senderInspected ? "done" : ""}>
@@ -160,20 +169,24 @@ export default function Station01({ mission }) {
               </div>
             </div>
 
-            <div className="panel-button-stack">
-              <button type="button" className="secondary-button" onClick={() => recordInvestigation("inspectSender", "sender")} disabled={isLocked}>
-                Inspect Sender
+            <div className="investigation-card-grid">
+              <button type="button" onClick={() => recordInvestigation("inspectSender", "sender")} disabled={isLocked}>
+                <span>Inspect Sender</span>
+                <small>Check the sender's information</small>
               </button>
               {scenario.link.exists && (
-                <button type="button" className="secondary-button" onClick={() => recordInvestigation("inspectLink", "link")} disabled={isLocked}>
-                  Inspect Link
+                <button type="button" onClick={() => recordInvestigation("inspectLink", "link")} disabled={isLocked}>
+                  <span>Inspect Link</span>
+                  <small>Preview the link destination</small>
                 </button>
               )}
-              <button type="button" className="secondary-button" onClick={() => recordInvestigation("viewDetails", "details")} disabled={isLocked}>
-                Message Details
+              <button type="button" onClick={() => recordInvestigation("viewDetails", "details")} disabled={isLocked}>
+                <span>View Message Details</span>
+                <small>Review message metadata</small>
               </button>
-              <button type="button" className="primary-button" onClick={() => setActivePanel("actions")} disabled={isLocked}>
-                Action Menu
+              <button type="button" className="decision-card" onClick={() => setActivePanel("actions")} disabled={isLocked}>
+                <span>Message Actions</span>
+                <small>Decide how to handle it</small>
               </button>
             </div>
           </aside>
@@ -204,4 +217,3 @@ export default function Station01({ mission }) {
     </main>
   );
 }
-

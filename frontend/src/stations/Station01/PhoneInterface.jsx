@@ -13,7 +13,12 @@ export default function PhoneInterface({
         <div className="phone-screen">
           <div className="phone-status">
             <span>{scenario.timestamp}</span>
-            <span>CM Secure</span>
+            <span className="phone-indicators" aria-label="Connection and battery status">
+              CM Secure
+              <i />
+              <i />
+              <b />
+            </span>
           </div>
 
           <div className="phone-app-bar">
@@ -34,8 +39,15 @@ export default function PhoneInterface({
             <article className="message-bubble">
               <p>{scenario.message}</p>
               {scenario.link.exists && (
-                <button type="button" className="message-link" onClick={onInspectLink} disabled={disabled}>
-                  {scenario.link.displayText}
+                <button type="button" className="message-link-card" onClick={onInspectLink} disabled={disabled}>
+                  <span className="link-card-icon" aria-hidden="true">
+                    ↗
+                  </span>
+                  <span>
+                    <strong>{scenario.link.displayText}</strong>
+                    <small>{scenario.link.destination}</small>
+                  </span>
+                  <em aria-hidden="true">›</em>
                 </button>
               )}
             </article>
@@ -56,4 +68,3 @@ export default function PhoneInterface({
     </section>
   );
 }
-

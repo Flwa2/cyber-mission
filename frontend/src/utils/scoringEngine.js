@@ -7,6 +7,10 @@ export function applyAction(mission, actionName, payload = {}) {
     return mission;
   }
 
+  if (rule.oncePerMission && mission.decisions?.[actionName]) {
+    return mission;
+  }
+
   const nextFlags = {
     ...mission.flags,
     ...(rule.flags || {}),

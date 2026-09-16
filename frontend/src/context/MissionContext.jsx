@@ -32,6 +32,13 @@ export function MissionProvider({ children }) {
         setMission(updatedMission);
         return updatedMission;
       },
+      updateMission(updater) {
+        if (!mission) return null;
+        const nextMission = typeof updater === "function" ? updater(mission) : updater;
+        const savedMission = missionService.saveMission(nextMission);
+        setMission(savedMission);
+        return savedMission;
+      },
       resetMission() {
         missionService.clearMission();
         setMission(null);

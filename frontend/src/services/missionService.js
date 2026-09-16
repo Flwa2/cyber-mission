@@ -1,6 +1,7 @@
 import { GAME_CONFIG } from "../config/gameConfig.js";
 import { generateMissionId } from "../utils/generateMissionId.js";
 import { applyAction } from "../utils/scoringEngine.js";
+import { ensureStation01State } from "../utils/station01Engine.js";
 import { storageService } from "./storageService.js";
 
 function createBaseMission() {
@@ -37,7 +38,8 @@ function createBaseMission() {
 
 export const missionService = {
   createMission() {
-    const mission = createBaseMission();
+    const mission = ensureStation01State(createBaseMission(), storageService.getLastStation01ScenarioId());
+    storageService.saveLastStation01ScenarioId(mission.decisions.station01.scenarioId);
     storageService.saveActiveMission(mission);
     return mission;
   },
@@ -48,6 +50,9 @@ export const missionService = {
 
   saveMission(mission) {
     storageService.saveActiveMission(mission);
+    if (mission.decisions?.station01?.scenarioId) {
+      storageService.saveLastStation01ScenarioId(mission.decisions.station01.scenarioId);
+    }
     return mission;
   },
 

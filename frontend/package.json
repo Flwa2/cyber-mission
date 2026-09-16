@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --configLoader native",
     "build": "vite build --configLoader native",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node scripts/validateStation01.mjs"
   },
   "dependencies": {
     "vite": "^7.0.0",

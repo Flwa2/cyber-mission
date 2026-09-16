@@ -10,9 +10,11 @@
     "test": "node scripts/validateStation01.mjs"
   },
   "dependencies": {
-    "vite": "^7.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "vite": "^7.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.2.0"
+  }
 }

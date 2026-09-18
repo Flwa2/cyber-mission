@@ -1,8 +1,9 @@
+import { DEV_PAUSE_MISSION_TIMER } from "../config/developmentConfig.js";
 import { useEffect, useMemo, useState } from "react";
 import { GAME_CONFIG } from "../config/gameConfig.js";
 
 function calculateRemainingSeconds(startedAt, durationSeconds) {
-  if (!startedAt) {
+  if (DEV_PAUSE_MISSION_TIMER || !startedAt) {
     return durationSeconds;
   }
 
@@ -24,6 +25,8 @@ export function useMissionTimer(startedAt) {
 
   useEffect(() => {
     setRemainingSeconds(calculateRemainingSeconds(startedAt, durationSeconds));
+
+    if (DEV_PAUSE_MISSION_TIMER) return undefined;
 
     const intervalId = window.setInterval(() => {
       setRemainingSeconds(calculateRemainingSeconds(startedAt, durationSeconds));

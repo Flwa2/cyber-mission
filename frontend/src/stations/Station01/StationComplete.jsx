@@ -4,10 +4,14 @@ import QRDisplay from "../../components/QRDisplay/QRDisplay.jsx";
 export default function StationComplete({ mission }) {
   return (
     <section className="station-complete-card">
-      <div>
-        <p className="eyebrow">Station 01 Complete</p>
-        <h2>Decision Recorded</h2>
-        <p>Continue your investigation at Station 02.</p>
+      <div className="complete-signal" aria-hidden="true">
+        <span />
+      </div>
+
+      <div className="complete-copy">
+        <p className="eyebrow">Station 01</p>
+        <h2>Complete</h2>
+        <strong>Decision Recorded</strong>
       </div>
 
       <div className="completion-grid">
@@ -20,12 +24,17 @@ export default function StationComplete({ mission }) {
         </div>
         <div>
           <span>Next Station</span>
-          <strong>02 / The Desk</strong>
+          <strong>02 The Desk</strong>
         </div>
+      </div>
+
+      <div className="handoff-panel">
+        <span>Proceed to Station 02</span>
+        <strong>The Desk</strong>
+        <p>Move to the next physical screen and continue with the same Mission ID.</p>
       </div>
 
       <QRDisplay missionId={mission.missionId} />
     </section>
   );
 }
-

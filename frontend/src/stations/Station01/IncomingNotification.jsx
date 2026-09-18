@@ -2,7 +2,7 @@ export default function IncomingNotification({ onSkip }) {
   return (
     <main className="screen station01-intro-screen">
       <section className="station01-intro-card">
-        <p className="eyebrow">Station 01 / 04</p>
+        <p className="eyebrow">Station 01</p>
         <h1>Suspicious Message</h1>
         <div className="incoming-pulse" aria-hidden="true">
           <span />
@@ -17,4 +17,3 @@ export default function IncomingNotification({ onSkip }) {
     </main>
   );
 }
-

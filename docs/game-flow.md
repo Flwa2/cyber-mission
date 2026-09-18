@@ -2,7 +2,9 @@
 
 ## Welcome
 
-The participant sees the mission title, time limit, station count, and ready status.
+The participant sees the supplied cinematic artwork with a static 08:00 mission-duration HUD, a live Start Mission button, and an icon-only fullscreen control. The artwork supplies the title and environmental text; no large station cards or duplicate titles cover it.
+
+Home does not create a Mission Session or start a countdown. The experience uses four physical devices, one per station. Cross-device backend synchronization remains pending.
 
 When they select **Start Mission**, the app:
 
@@ -15,15 +17,25 @@ When they select **Start Mission**, the app:
 
 ## Station 01: Suspicious Message
 
-Current status: placeholder only.
-
-Future station behavior:
+Current status: implemented.
 
 - Render a dynamic simulated SMS interface.
-- Select a scenario per participant.
+- Select a randomized scenario per participant.
 - Keep scenario classification hidden.
 - Record decisions such as inspecting the sender, opening a link, reporting phishing, or reporting a legitimate message.
 - Update Mission Session flags for later branching.
+- Show only the current station identity during gameplay.
+- Avoid showing the full four-station journey inside the station workspace.
+
+When Station 01 completes, the participant sees a neutral handoff:
+
+- Station 01 complete
+- Decision recorded
+- Proceed to Station 02, The Desk
+- Mission ID
+- Current mission time
+
+The handoff does not reveal correctness, score, scenario classification, pass/fail state, or attack state.
 
 ## Station 02: The Desk
 

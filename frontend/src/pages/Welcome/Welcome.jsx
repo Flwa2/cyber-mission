@@ -1,38 +1,24 @@
+import FullscreenButton from "../../components/FullscreenButton/FullscreenButton.jsx";
 import { GAME_CONFIG } from "../../config/gameConfig.js";
+import { formatTimer } from "../../hooks/useMissionTimer.js";
+import "./Welcome.css";
 
-export default function Welcome({ onStartMission }) {
+export default function Welcome({ onStartMission, launching = false }) {
   return (
-    <main className="screen welcome-screen">
-      <section className="welcome-hero">
-        <div className="hero-copy">
-          <p className="eyebrow">Cyber Mission</p>
-          <h1>
-            Mission
-            <span>Cyber Breach</span>
-          </h1>
-          <p className="hero-text">
-            A security incident is developing. Your decisions will determine what happens next.
-          </p>
-          <button type="button" className="primary-button" onClick={onStartMission}>
-            Start Mission
-          </button>
+    <main className={`cinematic-home${launching ? " is-launching" : ""}`} aria-label="Cyber Mission welcome" aria-busy={launching}>
+      <div className="home-hud">
+        <div className="home-duration" aria-label="Mission duration: eight minutes">
+          <span>MISSION TIME</span>
+          <strong>{formatTimer(GAME_CONFIG.missionDurationSeconds)}</strong>
         </div>
-
-        <div className="mission-card" aria-label="Mission briefing">
-          <div>
-            <span>Mission</span>
-            <strong>{GAME_CONFIG.stationCount} Stations</strong>
-          </div>
-          <div>
-            <span>Time</span>
-            <strong>08:00</strong>
-          </div>
-          <div>
-            <span>Status</span>
-            <strong>Ready</strong>
-          </div>
-        </div>
-      </section>
+        <FullscreenButton />
+      </div>
+      <div className="home-action">
+        <button type="button" className="home-start" onClick={onStartMission} disabled={launching}>
+          START MISSION <span aria-hidden="true">&rarr;</span>
+        </button>
+        <p>CAN YOU STOP THE BREACH?</p>
+      </div>
     </main>
   );
 }

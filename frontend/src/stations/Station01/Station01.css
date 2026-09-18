@@ -72,7 +72,7 @@
 .station01-layout {
   display: grid;
   flex: 1;
-  grid-template-columns: minmax(190px, 0.82fr) minmax(330px, 1.22fr) minmax(410px, 1.66fr);
+  grid-template-columns: minmax(165px, 0.58fr) minmax(370px, 1.12fr) minmax(430px, 1.42fr);
   gap: clamp(16px, 2vw, 28px);
   align-items: stretch;
   width: 100%;
@@ -95,7 +95,13 @@
   min-height: 0;
   flex-direction: column;
   gap: 18px;
-  padding: 22px;
+  justify-content: center;
+  padding: 20px;
+  border-color: rgba(56, 200, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(13, 29, 40, 0.42), rgba(5, 10, 15, 0.2)),
+    transparent;
+  box-shadow: none;
 }
 
 .station-brief-panel h1 {
@@ -116,44 +122,40 @@
   line-height: 1.45;
 }
 
-.station01-progress {
-  margin-top: auto;
-}
-
-.station01-progress .mission-progress {
+.station-focus-status {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  width: 100%;
-  margin: 0;
-}
-
-.station01-progress .mission-progress li {
-  display: grid;
-  grid-template-columns: 36px 1fr;
-  min-height: 58px;
+  grid-template-columns: 12px 1fr;
+  gap: 5px 10px;
   align-items: center;
-  padding: 10px;
-  border-color: rgba(56, 200, 255, 0.13);
-  background: rgba(255, 255, 255, 0.026);
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-medium);
+  background: rgba(25, 207, 255, 0.055);
 }
 
-.station01-progress .mission-progress li.active {
-  border-color: var(--border-active);
-  background: rgba(25, 207, 255, 0.08);
-  box-shadow: 0 0 28px rgba(25, 207, 255, 0.12);
+.focus-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: var(--glow-accent);
 }
 
-.station01-progress .mission-progress span {
-  color: var(--accent-primary);
-  font-size: 0.9rem;
+.station-focus-status strong,
+.station-focus-status small {
+  grid-column: 2;
 }
 
-.station01-progress .mission-progress p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.82rem;
-  line-height: 1.2;
+.station-focus-status strong {
+  font-size: 0.84rem;
+  text-transform: uppercase;
+}
+
+.station-focus-status small {
+  color: var(--text-muted);
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .phone-stage {
@@ -163,16 +165,16 @@
 }
 
 .phone-shell {
-  width: min(390px, 100%);
-  filter: drop-shadow(0 36px 80px rgba(0, 0, 0, 0.55));
+  width: min(430px, 100%);
+  filter: drop-shadow(0 42px 90px rgba(0, 0, 0, 0.62));
   animation: phoneReveal 520ms ease both;
 }
 
 .phone-hardware {
   position: relative;
-  padding: 14px;
+  padding: 12px;
   border: 1px solid rgba(178, 221, 245, 0.18);
-  border-radius: 38px;
+  border-radius: 44px;
   background:
     linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.025) 34%),
     linear-gradient(180deg, #0a0f14, #020508);
@@ -181,19 +183,34 @@
     inset 0 -18px 34px rgba(0, 0, 0, 0.45);
 }
 
-.phone-speaker {
-  width: 72px;
+.phone-sensor-row {
+  display: flex;
+  justify-content: center;
+  gap: 11px;
+  align-items: center;
+  height: 20px;
+  margin-bottom: 7px;
+}
+
+.phone-sensor-row span {
+  width: 76px;
   height: 5px;
-  margin: 0 auto 10px;
   border-radius: 99px;
-  background: rgba(244, 249, 252, 0.2);
+  background: rgba(244, 249, 252, 0.18);
+}
+
+.phone-sensor-row i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(25, 207, 255, 0.44);
 }
 
 .phone-screen {
   overflow: hidden;
-  min-height: min(680px, calc(100vh - 142px));
-  border: 1px solid rgba(56, 200, 255, 0.18);
-  border-radius: 28px;
+  min-height: min(700px, calc(100vh - 136px));
+  border: 1px solid rgba(56, 200, 255, 0.22);
+  border-radius: 32px;
   background:
     radial-gradient(circle at 82% 0%, rgba(46, 157, 255, 0.22), transparent 34%),
     linear-gradient(180deg, #081827, #06101a 45%, #04080d);
@@ -208,7 +225,7 @@
 }
 
 .phone-status {
-  padding: 15px 19px 8px;
+  padding: 17px 21px 8px;
   color: var(--text-muted);
   font-size: 0.75rem;
   font-weight: 900;
@@ -241,7 +258,7 @@
 }
 
 .phone-app-bar {
-  padding: 12px 16px;
+  padding: 14px 17px;
   border-bottom: 1px solid rgba(56, 200, 255, 0.14);
   background: rgba(255, 255, 255, 0.035);
 }
@@ -292,8 +309,8 @@
 }
 
 .message-thread {
-  min-height: min(476px, calc(100vh - 310px));
-  padding: 20px;
+  min-height: min(492px, calc(100vh - 306px));
+  padding: 22px;
 }
 
 .thread-date {
@@ -306,11 +323,13 @@
 }
 
 .message-bubble {
-  width: min(306px, 90%);
-  padding: 17px;
+  width: min(326px, 91%);
+  padding: 18px;
   border: 1px solid rgba(102, 186, 255, 0.16);
-  border-radius: 8px 18px 18px 18px;
-  background: linear-gradient(180deg, #1c3553, #17304a);
+  border-radius: 10px 22px 22px 22px;
+  background:
+    linear-gradient(180deg, rgba(46, 157, 255, 0.12), transparent 44%),
+    linear-gradient(180deg, #1c3553, #17304a);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
   animation: messageReveal 480ms ease 220ms both;
 }
@@ -324,12 +343,12 @@
 
 .message-link-card {
   display: grid;
-  grid-template-columns: 32px 1fr 14px;
+  grid-template-columns: 38px 1fr 14px;
   gap: 10px;
   align-items: center;
   width: 100%;
-  min-height: 64px;
-  padding: 10px;
+  min-height: 70px;
+  padding: 11px;
   border: 1px solid rgba(56, 200, 255, 0.24);
   border-radius: var(--radius-medium);
   color: var(--text-primary);
@@ -356,8 +375,8 @@
 .link-card-icon {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   color: #03101a;
   background: var(--accent-primary);
@@ -367,12 +386,12 @@
 .message-link-card em {
   color: var(--accent-primary);
   font-style: normal;
-  font-size: 1.4rem;
+  font-size: 1.25rem;
 }
 
 .phone-action-bar {
   gap: 9px;
-  padding: 13px;
+  padding: 14px;
   border-top: 1px solid rgba(56, 200, 255, 0.14);
   background: rgba(0, 0, 0, 0.22);
 }
@@ -392,7 +411,10 @@
   display: flex;
   min-height: 0;
   flex-direction: column;
-  padding: clamp(20px, 2.25vw, 32px);
+  padding: clamp(20px, 2.2vw, 30px);
+  background:
+    linear-gradient(90deg, rgba(25, 207, 255, 0.075), transparent 42%),
+    linear-gradient(180deg, rgba(10, 24, 34, 0.88), rgba(5, 10, 15, 0.82));
 }
 
 .investigation-panel h2,
@@ -465,7 +487,8 @@
 .action-grid button {
   position: relative;
   display: grid;
-  min-height: 72px;
+  grid-template-columns: 44px 1fr;
+  min-height: 76px;
   padding: 15px 44px 15px 16px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-medium);
@@ -481,9 +504,28 @@
   top: 50%;
   right: 16px;
   color: var(--accent-primary);
-  content: "›";
+  content: ">";
   font-size: 1.35rem;
   transform: translateY(-50%);
+}
+
+.investigation-card-grid i {
+  display: grid;
+  grid-row: 1 / span 2;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--accent-primary);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.investigation-card-grid span,
+.investigation-card-grid small {
+  grid-column: 2;
 }
 
 .investigation-card-grid button:active,
@@ -693,10 +735,67 @@
 
 .station-complete-card {
   display: grid;
+  justify-items: center;
   gap: 20px;
   width: min(920px, 100%);
   margin: 20px auto 0;
   padding: clamp(26px, 4vw, 46px);
+  text-align: center;
+}
+
+.complete-signal {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border: 1px solid rgba(115, 230, 162, 0.42);
+  border-radius: 50%;
+  background: rgba(115, 230, 162, 0.08);
+  box-shadow: 0 0 34px rgba(115, 230, 162, 0.18);
+}
+
+.complete-signal span {
+  width: 42px;
+  height: 22px;
+  border-bottom: 4px solid var(--success);
+  border-left: 4px solid var(--success);
+  transform: rotate(-45deg) translate(4px, -2px);
+}
+
+.complete-copy strong {
+  color: var(--success);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.handoff-panel {
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--border-active);
+  border-radius: var(--radius-medium);
+  background: rgba(25, 207, 255, 0.06);
+}
+
+.handoff-panel span,
+.handoff-panel strong {
+  display: block;
+  text-transform: uppercase;
+}
+
+.handoff-panel span {
+  color: var(--accent-primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.handoff-panel strong {
+  margin-top: 5px;
+  font-size: 1.4rem;
+}
+
+.handoff-panel p {
+  margin: 8px auto 0;
+  max-width: 560px;
 }
 
 .completion-grid {
@@ -772,7 +871,7 @@ button:disabled {
 
 @media (max-width: 1200px) {
   .station01-layout {
-    grid-template-columns: minmax(180px, 0.75fr) minmax(300px, 1.1fr) minmax(340px, 1.25fr);
+    grid-template-columns: minmax(150px, 0.5fr) minmax(320px, 1fr) minmax(360px, 1.15fr);
     gap: 14px;
   }
 
@@ -782,7 +881,7 @@ button:disabled {
   }
 
   .phone-shell {
-    width: min(340px, 100%);
+    width: min(360px, 100%);
   }
 }
 
@@ -794,10 +893,6 @@ button:disabled {
 
   .station01-layout {
     grid-template-columns: 1fr;
-  }
-
-  .station01-progress .mission-progress {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .phone-stage {
@@ -821,7 +916,7 @@ button:disabled {
   }
 
   .station01-layout {
-    grid-template-columns: minmax(170px, 0.78fr) minmax(290px, 1fr) minmax(360px, 1.45fr);
+    grid-template-columns: minmax(145px, 0.5fr) minmax(300px, 0.95fr) minmax(360px, 1.18fr);
   }
 
   .station-brief-panel h1 {
@@ -829,7 +924,7 @@ button:disabled {
   }
 
   .phone-shell {
-    width: min(320px, 100%);
+    width: min(335px, 100%);
   }
 
   .phone-screen {
@@ -847,4 +942,3 @@ button:disabled {
     padding-bottom: 12px;
   }
 }
-

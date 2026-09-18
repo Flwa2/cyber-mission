@@ -9,7 +9,11 @@ export default function PhoneInterface({
   return (
     <section className="phone-shell" aria-label="Simulated corporate mobile phone">
       <div className="phone-hardware">
-        <div className="phone-speaker" />
+        <div className="phone-sensor-row" aria-hidden="true">
+          <span />
+          <i />
+        </div>
+
         <div className="phone-screen">
           <div className="phone-status">
             <span>{scenario.timestamp}</span>
@@ -30,7 +34,7 @@ export default function PhoneInterface({
               </span>
             </button>
             <button type="button" className="phone-icon-button" onClick={onViewDetails} disabled={disabled}>
-              Details
+              Info
             </button>
           </div>
 
@@ -41,13 +45,13 @@ export default function PhoneInterface({
               {scenario.link.exists && (
                 <button type="button" className="message-link-card" onClick={onInspectLink} disabled={disabled}>
                   <span className="link-card-icon" aria-hidden="true">
-                    ↗
+                    LINK
                   </span>
                   <span>
                     <strong>{scenario.link.displayText}</strong>
                     <small>{scenario.link.destination}</small>
                   </span>
-                  <em aria-hidden="true">›</em>
+                  <em aria-hidden="true">&gt;</em>
                 </button>
               )}
             </article>

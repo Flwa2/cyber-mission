@@ -13,6 +13,8 @@
   --accent-primary: #19cfff;
   --accent-secondary: #2e9dff;
   --accent-deep: #1677b8;
+  --incident-red: #ff3f56;
+  --incident-red-soft: rgba(255, 63, 86, 0.16);
   --warning: #f3c969;
   --danger: #f06d6d;
   --success: #73e6a2;

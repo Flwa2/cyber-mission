@@ -1,3 +1,4 @@
+import { getStationStatuses } from "../src/utils/stationStatus.js";
 import { SMS_SCENARIOS } from "../src/data/smsScenarios.js";
 import {
   completeStation01,
@@ -74,6 +75,10 @@ const legitimateScenario = SMS_SCENARIOS.find((scenario) => scenario.classificat
 assert(SMS_SCENARIOS.filter((scenario) => scenario.classification === "phishing").length >= 6, "Expected at least 6 phishing scenarios");
 assert(SMS_SCENARIOS.filter((scenario) => scenario.classification === "legitimate").length >= 6, "Expected at least 6 legitimate scenarios");
 
+assert(SMS_SCENARIOS.length === 12, "Expected exactly 12 SMS scenarios");
+const initialMission = createMissionForScenario(phishingScenario.id);
+assert(getStationStatuses(initialMission).map((station) => station.status).join() === "ACTIVE,WAITING,WAITING,WAITING", "New mission should activate only Station 01");
+
 let pathA = createMissionForScenario(phishingScenario.id);
 pathA = recordStation01Investigation(pathA, "inspectSender");
 pathA = recordStation01Investigation(pathA, "inspectLink");
@@ -82,6 +87,9 @@ assert(pathA.decisions.station01.senderInspected, "Path A should record sender i
 assert(pathA.decisions.station01.linkInspected, "Path A should record link inspection");
 assert(pathA.flags.phishingReported, "Path A should record phishing report flag");
 assert(pathA.completedStations.includes(1), "Path A should complete Station 01");
+
+assert(pathA.currentStation === 1, "Device 1 must stay at Station 01 after completion");
+assert(getStationStatuses(pathA).map((station) => station.status).join() === "COMPLETED,READY,WAITING,WAITING", "Completion should ready only Station 02");
 
 let pathB = createMissionForScenario(phishingScenario.id);
 pathB = completeStation01(pathB, "openLink");

@@ -27,12 +27,11 @@ export default function Station01({ mission }) {
   const timer = useMissionTimer(mission.startedAt);
   const [introVisible, setIntroVisible] = useState(true);
   const [activePanel, setActivePanel] = useState(null);
-  const [processing, setProcessing] = useState(false);
   const [browserVisible, setBrowserVisible] = useState(false);
 
   const station01 = mission.decisions?.station01;
   const scenario = useMemo(() => getParticipantScenario(station01), [station01]);
-  const isLocked = Boolean(station01?.completedAt || station01?.timedOut || processing);
+  const isLocked = Boolean(station01?.completedAt || station01?.timedOut);
 
   useEffect(() => {
     if (!station01?.scenarioId) {
@@ -54,7 +53,6 @@ export default function Station01({ mission }) {
     if (timer.isExpired && station01?.scenarioId && !station01.completedAt && !station01.timedOut) {
       updateMission((currentMission) => expireStation01(currentMission));
       setActivePanel(null);
-      setProcessing(false);
     }
   }, [station01?.completedAt, station01?.scenarioId, station01?.timedOut, timer.isExpired, updateMission]);
 
@@ -72,12 +70,7 @@ export default function Station01({ mission }) {
       return;
     }
 
-    setProcessing(true);
     updateMission((currentMission) => completeStation01(currentMission, finalAction));
-
-    window.setTimeout(() => {
-      setProcessing(false);
-    }, 1100);
   }
 
   if (!scenario || !station01?.scenarioId) {
@@ -113,15 +106,7 @@ export default function Station01({ mission }) {
     <main className="screen station-screen station01-screen">
       <MissionTopBar mission={mission} />
 
-      {processing && (
-        <div className="decision-processing" role="status" aria-live="polite">
-          <span />
-          <p>Decision Recorded</p>
-          <small>Updating mission state...</small>
-        </div>
-      )}
-
-      {!processing && station01.completedAt && !browserVisible ? (
+      {station01.completedAt && !browserVisible ? (
         <StationComplete mission={mission} />
       ) : (
         <section className="station01-layout" aria-label="Station 01 suspicious message investigation">

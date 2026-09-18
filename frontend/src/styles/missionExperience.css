@@ -1,0 +1,109 @@
+/* Shared mission chrome: Home keeps its own approved styling. */
+.mission-topbar { display: flex; justify-content: space-between; flex-shrink: 0; min-height: 56px; padding: 6px 10px; border: 0; border-bottom: 1px solid #83cce518; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+.mission-topbar .incident-flag { width: 30px; height: 34px; border: 0; background: transparent; box-shadow: none; }
+.mission-topbar .incident-flag::after { display: none; }
+.mission-topbar .incident-identity strong { font-size: 12px; letter-spacing: .08em; }
+.mission-topbar .incident-identity small { font-size: 9px; letter-spacing: .16em; color: #b08e94; }
+.mission-topbar-meta { gap: 22px; }
+.mission-topbar .topbar-data, .mission-topbar .mission-timer { min-width: 102px; }
+.mission-topbar .topbar-window-button { width: 44px; height: 44px; border: 0; border-radius: 5px; background: transparent; color: #9eafbb; transition: background .2s, color .2s; }
+.mission-topbar .topbar-window-button:hover, .mission-topbar .topbar-window-button:focus-visible { background: #38c8ff12; color: #79dfff; }
+.mission-topbar .topbar-window-button.exit:hover, .mission-topbar .topbar-window-button.exit:focus-visible { background: #ff435815; color: #ff8b99; }
+.mission-topbar button:focus-visible { outline: 2px solid #70dfff; outline-offset: 2px; }
+.exit-mission-dialog { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; margin: auto; padding: 30px; color: #edf6fa; border: 1px solid #93cde52b; border-top-color: #ec536366; border-radius: 10px; background: radial-gradient(ellipse at top left, #8b152321, transparent 65%), #071018f5; box-shadow: 0 30px 100px #000b; }
+.exit-mission-dialog::backdrop { background: #010409bd; backdrop-filter: blur(5px); }
+.exit-marker { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: 20px; border: 1px solid #fa596655; color: #f77d89; border-radius: 6px; }
+.exit-mission-dialog .eyebrow { font-size: 10px; color: #d5929b; }
+.exit-mission-dialog h2 { font-size: 24px; text-transform: uppercase; margin-bottom: 12px; }
+.exit-mission-dialog #exit-description { color: #9eadba; font-size: 14px; line-height: 1.6; }
+.exit-dialog-actions { display: flex; gap: 12px; margin-top: 26px; }
+.exit-dialog-actions button { flex: 1; min-height: 48px; padding: 10px; border-radius: 5px; font-size: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.exit-cancel { border: 1px solid #52cfee99; color: #edfbff; background: #103444; }
+.exit-confirm { border: 1px solid #ec637344; color: #ed9ca6; background: #56162025; }
+.exit-dialog-actions button:hover { filter: brightness(1.25); }
+.exit-dialog-actions button:focus-visible { outline: 2px solid #98e8ff; outline-offset: 3px; }
+.station01-screen, .station-screen, .station-waiting-screen { background: radial-gradient(ellipse at 8% 12%, #a71b3012, transparent 42%), radial-gradient(ellipse at 49% 68%, #147d9c1c, transparent 46%), linear-gradient(#70bbdc04 1px, transparent 1px), #03070b; background-size: auto, auto, 100% 64px, auto; }
+.station01-screen { padding: 14px 32px; gap: 18px; }
+.station01-layout { grid-template-columns: minmax(220px, .85fr) minmax(370px, 1.2fr) minmax(310px, 1fr); gap: clamp(24px, 3vw, 64px); align-items: center; max-width: 1620px; margin: 0 auto; }
+.station-brief-panel, .investigation-panel { border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; padding: 20px 4px; }
+.station-brief-panel { gap: 18px; }
+.station-brief-panel h1 { font-size: clamp(32px, 3vw, 56px); line-height: 1.04; }
+.station-brief-panel > p:not(.eyebrow) { max-width: 260px; color: #98a9b8; line-height: 1.7; }
+.station-focus-status { border: 0; border-left: 1px solid #38c8ff55; border-radius: 0; background: transparent; padding: 8px 14px; }
+.investigation-panel > .eyebrow { font-size: 10px; letter-spacing: .18em; }
+.investigation-panel h2 { font-size: 28px; }
+.investigation-panel > p:not(.eyebrow) { font-size: 13px; color: #8d9ead; }
+.investigation-status-list { gap: 12px; margin: 20px 0 26px; }
+.investigation-status-list div, .investigation-status-list .done { padding: 8px 0; border: 0; border-radius: 0; border-bottom: 1px solid #80cde522; background: transparent; gap: 8px; }
+.investigation-status-list strong { font-size: 11px; color: #aebfc9; font-weight: 500; }
+.investigation-status-list .done strong { color: #80d7ed; }
+.investigation-card-grid { gap: 0; margin: 0; }
+.investigation-card-grid button { min-height: 74px; padding: 14px 30px 14px 6px; border: 0; border-bottom: 1px solid #80cde522; border-radius: 0; background: transparent; }
+.investigation-card-grid button:hover, .investigation-card-grid button:focus-visible { background: #38c8ff0c; outline: 1px solid #38c8ff44; outline-offset: -1px; }
+.investigation-card-grid span { font-size: 12px; letter-spacing: .05em; }
+.investigation-card-grid small { font-size: 11px; }
+.investigation-card-grid i { border: 0; background: #38c8ff0a; border-radius: 3px; }
+.investigation-card-grid .decision-card { margin-top: 12px; border: 1px solid #38c8ff55; padding-left: 10px; background: #071720aa; border-radius: 4px; }
+.phone-shell { width: min(430px, 100%); filter: drop-shadow(0 30px 38px #000b) drop-shadow(0 0 25px #239dc51a); }
+.phone-hardware { padding: 10px; border-color: #b2ddf540; }
+.phone-screen { display: flex; flex-direction: column; min-height: 0; height: min(740px, calc(100dvh - 178px)); }
+.message-thread { flex: 1; min-height: 0; overflow: auto; padding: 20px; }
+.phone-status, .phone-app-bar, .phone-action-bar { flex-shrink: 0; }
+.message-bubble { width: 96%; }
+.message-link-card { grid-template-columns: 28px minmax(0, 1fr) 10px; gap: 8px; padding: 10px; }
+.message-link-card small, .message-link-card strong { overflow-wrap: anywhere; }
+.link-card-icon { width: 28px; height: 30px; font-size: 8px; color: #9cddf3; background: #59ceff12; }
+.sender-avatar { color: #bde9f6; background: #17506c66; }
+.phone-app-bar button:first-child { min-width: 0; }
+.phone-app-bar strong { font-size: 14px; }
+.station-complete-card { position: relative; display: flex; flex: 1; min-height: 0; flex-direction: column; align-items: center; justify-content: center; width: min(900px, 100%); gap: clamp(12px, 2vh, 22px); margin: 0 auto; padding: 20px; border: 0; border-radius: 0; background: radial-gradient(ellipse at 50% 68%, #147d9c12, transparent 65%); box-shadow: none; backdrop-filter: none; overflow: hidden; }
+.complete-signal { flex-shrink: 0; width: 58px; height: 58px; border: 0; background: transparent; box-shadow: none; }
+.complete-signal span { width: 32px; height: 17px; border-width: 3px; animation: checkReveal .4s .12s both; }
+.complete-copy { animation: handoffReveal .45s .2s both; }
+.complete-copy .eyebrow { font-size: 11px; letter-spacing: .23em; margin-bottom: 12px; color: #a1b2be; }
+.complete-copy h2 { font-size: clamp(38px, 4.2vw, 62px); letter-spacing: .06em; color: #91dcb0; margin-bottom: 12px; }
+.complete-copy strong { font-size: 10px; letter-spacing: .22em; font-weight: 600; color: #c1cdd6; }
+.completion-meta { display: flex; align-items: center; justify-content: center; gap: 15px; color: #8599a9; font-size: 11px; letter-spacing: .08em; }
+.completion-meta strong { color: #c3d3de; font-weight: 500; }
+.completion-meta .mission-timer { display: flex; gap: 7px; padding: 0; border-radius: 0; background: transparent; }
+.completion-meta .mission-timer span, .completion-meta .mission-timer strong { font-size: 11px; font-weight: 500; }
+.handoff-panel { width: min(510px, 100%); padding: clamp(18px, 3vh, 30px) 10px 0; border: 0; border-top: 1px solid #80cde529; border-radius: 0; background: transparent; animation: handoffReveal .45s .5s both; }
+.handoff-panel .handoff-label { color: #b6a569; font-size: 9px; letter-spacing: .24em; }
+.handoff-destination { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 12px 0 20px; }
+.handoff-destination span { font-size: clamp(40px, 4.5vw, 64px); font-weight: 300; color: #57c8e7; line-height: 1; }
+.handoff-destination strong { margin: 0; font-size: clamp(24px, 2.7vw, 36px); letter-spacing: .06em; }
+.handoff-panel .handoff-instruction { color: #c9eef9; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+.handoff-instruction span { display: inline; margin-left: 8px; color: #66d6f5; }
+.handoff-panel > p:last-child { font-size: 12px; color: #8599a9; margin-top: 12px; }
+.handoff-scan { position: absolute; top: 12%; left: 25%; width: 50%; height: 1px; background: linear-gradient(90deg, transparent, #76d9ff66, transparent); animation: handoffScan .6s both; pointer-events: none; }
+.station01-panel-backdrop { place-items: center; }
+.station01-panel { max-height: calc(100dvh - 48px); overflow: auto; }
+.station-waiting-screen:has(> .mission-topbar) { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 14px 32px; }
+.station-waiting-screen > .mission-topbar { width: 100%; }
+@keyframes checkReveal { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0); } }
+@keyframes handoffReveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes handoffScan { from { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } to { opacity: 0; transform: translateY(220px); } }
+@media (max-height: 820px) and (min-width: 981px) {
+ .station01-screen { padding: 10px 24px; gap: 12px; }
+ .station01-layout { grid-template-columns: minmax(210px, .85fr) minmax(350px, 1.2fr) minmax(300px, 1fr); gap: 26px; }
+ .phone-shell { width: min(370px, 100%); }
+ .phone-screen { height: calc(100dvh - 158px); }
+ .phone-app-bar { padding: 8px 12px; }
+ .message-thread { padding: 16px; }
+ .message-bubble { padding: 15px; }
+ .message-bubble p { font-size: 14px; }
+ .investigation-card-grid button { min-height: 64px; }
+}
+@media (max-width: 980px) {
+ .station01-layout { grid-template-columns: 1fr; }
+ .station01-screen { height: auto; overflow: visible; }
+ .phone-screen { height: 620px; }
+ .mission-topbar { flex-wrap: wrap; gap: 10px; }
+ .mission-topbar-meta { gap: 8px; flex-wrap: wrap; }
+ .station-complete-card { min-height: 580px; }
+ .completion-meta { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+ .complete-signal span, .complete-copy, .handoff-panel, .handoff-scan, .phone-shell, .message-bubble { animation: none; }
+ .handoff-scan { display: none; }
+}

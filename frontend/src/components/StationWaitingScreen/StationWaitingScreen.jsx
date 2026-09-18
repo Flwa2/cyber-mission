@@ -1,3 +1,4 @@
+import MissionTopBar from "../MissionTopBar/MissionTopBar.jsx";
 import { STATION_STATUS, STATIONS } from "../../utils/stationStatus.js";
 import MissionTimer from "../MissionTimer/MissionTimer.jsx";
 
@@ -17,6 +18,7 @@ export default function StationWaitingScreen({ mission, stationNumber = 2, statu
 
   return (
     <main className="screen center-screen station-waiting-screen">
+      {mission && <MissionTopBar mission={mission} />}
       <section className={`station-waiting-card status-${status.toLowerCase()}`} aria-live="polite">
         <div className="incident-identity large">
           <span className="incident-flag" aria-hidden="true" />

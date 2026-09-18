@@ -1,3 +1,4 @@
+import ExitMissionDialog from "../ExitMissionDialog/ExitMissionDialog.jsx";
 import { useState } from "react";
 import { useMission } from "../../context/MissionContext.jsx";
 import FullscreenButton from "../FullscreenButton/FullscreenButton.jsx";
@@ -51,21 +52,7 @@ export default function MissionTopBar({ mission }) {
       </div>
 
       {exitConfirmOpen && (
-        <div className="exit-confirm-backdrop" role="presentation">
-          <section className="exit-confirm-card" role="dialog" aria-modal="true" aria-labelledby="exit-title">
-            <p className="eyebrow">Exit Mission</p>
-            <h2 id="exit-title">Exit current mission?</h2>
-            <p>Your current mission progress will end.</p>
-            <div className="confirm-actions">
-              <button type="button" className="secondary-button" onClick={() => setExitConfirmOpen(false)}>
-                Cancel
-              </button>
-              <button type="button" className="primary-button danger-action" onClick={resetMission}>
-                Exit Mission
-              </button>
-            </div>
-          </section>
-        </div>
+        <ExitMissionDialog onCancel={() => setExitConfirmOpen(false)} onExit={resetMission} />
       )}
     </header>
   );

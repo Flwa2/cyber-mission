@@ -14,10 +14,12 @@ export default function Welcome({ onStartMission, launching = false }) {
         <FullscreenButton />
       </div>
       <div className="home-action">
+        <div className="home-incident"><span aria-hidden="true" />ACTIVE INCIDENT</div>
         <button type="button" className="home-start" onClick={onStartMission} disabled={launching}>
           START MISSION <span aria-hidden="true">&rarr;</span>
         </button>
         <p>CAN YOU STOP THE BREACH?</p>
+        {launching && <div className="home-launch-message" role="status">INCIDENT RESPONSE INITIATED</div>}
       </div>
     </main>
   );

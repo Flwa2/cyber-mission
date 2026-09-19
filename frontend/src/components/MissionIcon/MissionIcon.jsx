@@ -1,4 +1,6 @@
 const paths = {
+  plus: "M12 4v16M4 12h16",
+  microphone: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM6 10v2a6 6 0 0 0 12 0v-2M12 18v4M9 22h6",
   sender: "M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2",
   details: "M6 3h8l4 4v14H6ZM14 3v5h4M9 12h6M9 16h6",
   actions: "M4 6h12m-4-4 4 4-4 4M20 18H8m4-4-4 4 4 4",

@@ -40,7 +40,7 @@
 .room-monitor { position: absolute; left: -3%; top: 16%; width: 36%; height: 46%; border: 9px solid #051018; border-radius: 8px; transform: perspective(700px) rotateY(18deg); background: repeating-linear-gradient(0deg, transparent 0 26px, #3894af12 27px 28px), linear-gradient(120deg, #082132, #030a10); box-shadow: 0 0 30px #123e5440, inset 0 0 70px #000; opacity: .48; filter: blur(3px); }
 .room-monitor::before { content: ""; position: absolute; inset: 17% 12%; border-top: 2px solid #32cce533; border-bottom: 1px solid #32cce52a; background: repeating-linear-gradient(90deg, transparent 0 42px, #277d9626 43px 45px); }
 .room-beacon { position: absolute; top: 17%; left: 31%; width: 23px; height: 10px; transform: rotate(16deg); border-radius: 3px; background: #fb4766; box-shadow: 0 0 16px #ff415d, 0 0 65px 22px #e5144255, 0 90px 110px 20px #cf183e40; filter: blur(2px); opacity: .62; }
-.room-glass { position: absolute; inset: 11% 24% 12% 35%; border-left: 2px solid #ca556123; border-right: 1px solid #53cceb22; background: linear-gradient(105deg, transparent 40%, #a4d9ee06 41%, transparent 46%); transform: skewY(-7deg); }
+.room-glass { position: absolute; inset: 11% 24% 12% 35%; background: linear-gradient(105deg, transparent 40%, #a4d9ee06 41%, transparent 46%); transform: skewY(-7deg); }
 .room-desk { position: absolute; left: -10%; right: -10%; bottom: -16%; height: 35%; transform: perspective(600px) rotateX(48deg) rotateZ(-4deg); border-top: 1px solid #51829733; background: linear-gradient(100deg, #0b1118, #61233338 35%, #06314444 63%, #020608), repeating-linear-gradient(0deg, transparent 0 34px, #9cc8dc07 35px 36px); box-shadow: 0 -20px 70px #0008; }
 .station01-layout { display: grid; grid-template-columns: minmax(265px, .98fr) minmax(340px, 1.08fr) minmax(350px, 1.18fr); gap: clamp(28px, 3vw, 58px); align-items: center; max-width: 1580px; margin: 0 auto; }
 .station-brief-panel, .investigation-panel { border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; padding: 0; }
@@ -55,7 +55,7 @@
 .incident-awareness strong { color: #e39da8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
 .incident-awareness p { margin: 8px 0 0; color: #92aebf; font-size: 12px; line-height: 1.6; }
 .investigation-panel { position: relative; padding: 24px 0; }
-.investigation-panel::before { content: ""; position: absolute; z-index: -1; inset: -15px -24px; border-left: 1px solid #3a9ab21c; background: linear-gradient(100deg, #05202d55, #020b1311); mask-image: linear-gradient(transparent, black 15% 85%, transparent); }
+.investigation-panel::before { content: ""; position: absolute; z-index: -1; inset: -15px -24px; background: linear-gradient(100deg, #05202d55, #020b1311); mask-image: linear-gradient(transparent, black 15% 85%, transparent); }
 .investigation-panel > .eyebrow { font-size: 11px; letter-spacing: .2em; color: #81aec3; padding-left: 12px; border-left: 3px solid #23cde0; }
 .investigation-panel h2 { font-size: clamp(28px, 2.5vw, 42px); letter-spacing: -.01em; margin: 8px 0 12px; }
 .investigation-panel > p:not(.eyebrow) { font-size: 16px; color: #9bb9c9; }
@@ -83,7 +83,7 @@
 .phone-side-key { position: absolute; width: 3px; border-radius: 2px; background: linear-gradient(#98a3ae, #2f3e48 40%, #6d7b86); }
 .phone-side-key.volume { left: -4px; top: 21%; height: 64px; box-shadow: 0 -37px 0 -1px #a07e89; }
 .phone-side-key.power { right: -4px; top: 29%; height: 78px; }
-.phone-screen { display: flex; flex-direction: column; min-height: 0; height: min(810px, calc(100dvh - 160px)); border: 1px solid #183443; border-radius: 46px; background: radial-gradient(ellipse at 70% 0, #132a36, transparent 45%), linear-gradient(#040b11, #02070a); }
+.phone-screen { display: flex; flex-direction: column; min-height: 0; height: min(810px, calc(100dvh - 160px)); border: 1px solid #183443; border-radius: 46px; background: #050506; }
 .phone-status { position: relative; display: flex; align-items: center; justify-content: space-between; height: 49px; padding: 0 22px; font-size: 12px; font-weight: 600; color: #e5edf2; flex-shrink: 0; }
 .phone-island { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); width: 31%; height: 25px; border-radius: 30px; background: #010203; box-shadow: inset 0 1px 2px #000; }
 .phone-island i { position: absolute; right: 10px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #185278, #010611 70%); }
@@ -93,23 +93,24 @@
 .phone-indicators i:nth-child(3) { height: 12px; }
 .phone-indicators svg { width: 16px; height: 16px; margin-left: 2px; }
 .phone-indicators b { width: 19px; height: 9px; border-radius: 3px; background: linear-gradient(90deg, #d7e6ee 78%, transparent 78%); box-shadow: inset 0 0 0 1px #071017; }
-.phone-app-bar { position: relative; flex-shrink: 0; justify-content: center; padding: 8px 16px 15px; border-bottom: 1px solid #35748d22; background: linear-gradient(#0b192266, #0b192222); }
-.phone-app-bar .phone-sender { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 80%; min-height: 0; text-align: center; padding: 0; }
-.sender-avatar { width: 40px; height: 40px; border: 1px solid #93b4c455; background: linear-gradient(135deg, #7a95a9, #334957); color: #fff; font-size: 14px; font-weight: 600; }
+.phone-app-bar { position: relative; flex-shrink: 0; justify-content: center; padding: 8px 16px 15px; border-bottom: 1px solid #ffffff08; background: linear-gradient(#111114, #09090b); }
+.phone-app-bar .phone-sender { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 90%; min-height: 0; text-align: center; padding: 0; }
+.sender-avatar { width: 40px; height: 40px; border: 1px solid #93b4c455; background: linear-gradient(135deg, #686674, #41414c); color: #fff; font-size: 14px; font-weight: 600; }
 .phone-app-bar strong { font-size: 13px; font-weight: 600; }
-.phone-app-bar small { margin: 0; color: #8ca3b2; font-size: 10px; font-weight: 400; }
-.phone-info { position: absolute; right: 9px; top: 30px; display: grid; place-items: center; width: 44px; height: 44px; }
-.phone-info svg { width: 20px; height: 20px; color: #61cce9; }
+.phone-app-bar small { margin: 0; color: #929299; font-size: 10px; font-weight: 400; }
 .message-thread { flex: 1; min-height: 0; overflow: auto; padding: 20px 16px; }
-.thread-date { margin: 0 0 20px; color: #7897a9; font-size: 11px; font-weight: 400; text-transform: none; line-height: 1.5; }
+.thread-date { margin: 0 0 20px; color: #8d8d94; font-size: 11px; font-weight: 400; text-transform: none; line-height: 1.5; }
 .thread-date span { display: block; }
-.message-bubble { width: 100%; padding: 17px; border: 1px solid #789bb51f; border-radius: 23px 23px 23px 7px; background: linear-gradient(130deg, #263b4b, #172b3a); box-shadow: 0 10px 26px #0005; }
-.message-bubble p { font-size: clamp(14px, 1vw, 17px); line-height: 1.55; font-weight: 400; margin: 0; color: #e8f0f5; }
-.message-link-card { display: grid; grid-template-columns: 21px minmax(0, 1fr) 16px; gap: 8px; margin-top: 16px; padding: 12px 8px; min-height: 64px; border: 1px solid #4a95ad55; background: #12465d44; border-radius: 10px; }
-.message-link-card svg { width: 19px; height: 19px; color: #6dd0eb; }
-.message-link-card small, .message-link-card strong { overflow-wrap: anywhere; }
-.message-link-card strong { font-size: 12px; font-weight: 600; }
-.message-link-card small { font-size: 10px; margin-top: 4px; }
+.message-bubble { position: relative; width: fit-content; max-width: 96%; padding: 14px 16px; border: 0; border-radius: 20px 20px 20px 6px; background: #262629; box-shadow: none; }
+.message-bubble::before { content: ""; position: absolute; left: -5px; bottom: 0; width: 12px; height: 12px; border-radius: 0 0 12px 0; background: #262629; }
+.message-bubble p { position: relative; font-size: clamp(14px, 1vw, 17px); line-height: 1.5; font-weight: 400; margin: 0; color: #ededf0; overflow-wrap: anywhere; }
+.sms-link { display: inline; padding: 0; border: 0; border-radius: 2px; color: #62adff; background: transparent; font: inherit; text-align: left; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; cursor: pointer; }
+.sms-link:hover { color: #9fcdff; }
+.sms-composer { display: flex; align-items: center; gap: 9px; flex-shrink: 0; padding: 10px 14px 3px; color: #85858b; }
+.composer-add { display: grid; place-items: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: #1c1c1f; color: #bcbcc3; }
+.sms-composer svg { width: 20px; height: 20px; flex-shrink: 0; }
+.composer-field { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; flex: 1; min-height: 36px; padding: 7px 10px; border: 1px solid #37373b; border-radius: 22px; background: #111113; font-size: 11px; }
+.composer-field span { white-space: nowrap; }
 .phone-home-area { display: grid; place-items: center; flex-shrink: 0; height: 25px; }
 .phone-home-area span { width: 32%; height: 4px; border-radius: 8px; background: #e8edf2; opacity: .86; }
 .phone-shell button:focus-visible { outline: 2px solid #70dfff; outline-offset: 2px; }

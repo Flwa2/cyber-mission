@@ -128,9 +128,7 @@ export default function Station01({ mission }) {
             <PhoneInterface
               scenario={scenario}
               disabled={isLocked}
-              onInspectSender={() => recordInvestigation("inspectSender", "sender")}
               onInspectLink={() => recordInvestigation("inspectLink", "link")}
-              onViewDetails={() => recordInvestigation("viewDetails", "details")}
             />
           </div>
 

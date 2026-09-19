@@ -1,5 +1,5 @@
 import MissionIcon from "../../components/MissionIcon/MissionIcon.jsx";
-export default function PhoneInterface({ scenario, onInspectSender, onInspectLink, onViewDetails, disabled }) {
+export default function PhoneInterface({ scenario, onInspectLink, disabled }) {
   return (
     <section className="phone-shell" aria-label="Simulated corporate mobile phone">
       <div className="phone-hardware">
@@ -11,20 +11,20 @@ export default function PhoneInterface({ scenario, onInspectSender, onInspectLin
             <span className="phone-indicators" aria-label="Signal, Wi-Fi and battery"><i /><i /><i /><MissionIcon name="wifi" /><b /></span>
           </div>
           <div className="phone-app-bar">
-            <button type="button" className="phone-sender" aria-label="Inspect sender details" onClick={onInspectSender} disabled={disabled}>
+            <div className="phone-sender">
               <span className="sender-avatar">{scenario.sender.name.slice(0, 2).toUpperCase()}</span>
               <strong>{scenario.sender.name}</strong><small>{scenario.sender.displayNumber}</small>
-            </button>
-            <button type="button" className="phone-info" onClick={onViewDetails} disabled={disabled} aria-label="View message information"><MissionIcon name="details" /></button>
+            </div>
           </div>
           <div className="message-thread">
-            <p className="thread-date">Text Message<span>Today {scenario.timestamp}</span></p>
+            <p className="thread-date">Today {scenario.timestamp}</p>
             <article className="message-bubble">
-              <p>{scenario.message}</p>
-              {scenario.link.exists && <button type="button" className="message-link-card" onClick={onInspectLink} disabled={disabled}>
-                <MissionIcon name="link" /><span><strong>{scenario.link.displayText}</strong><small>{scenario.link.destination}</small></span><MissionIcon name="continue" />
-              </button>}
+              <p>{scenario.message}{scenario.link.exists && <>{" "}<button type="button" className="sms-link" onClick={onInspectLink} disabled={disabled} aria-label={`Inspect link: ${scenario.link.destination}`}>{scenario.link.destination}</button></>}</p>
             </article>
+          </div>
+          <div className="sms-composer" role="group" aria-label="Message composer unavailable in this simulation">
+            <span className="composer-add" aria-hidden="true"><MissionIcon name="plus" /></span>
+            <div className="composer-field" aria-disabled="true"><span>Text Message &bull; SMS</span><MissionIcon name="microphone" /></div>
           </div>
           <div className="phone-home-area" aria-hidden="true"><span /></div>
         </div>

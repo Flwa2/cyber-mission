@@ -1,3 +1,4 @@
+import CyberMissionBrand from "../CyberMissionBrand/CyberMissionBrand.jsx";
 import ExitMissionDialog from "../ExitMissionDialog/ExitMissionDialog.jsx";
 import { useState } from "react";
 import { useMission } from "../../context/MissionContext.jsx";
@@ -19,12 +20,9 @@ export default function MissionTopBar({ mission }) {
 
   return (
     <header className="mission-topbar">
-      <div className="incident-identity">
-        <span className="incident-flag" aria-hidden="true" />
-        <div>
-          <strong>Cyber Breach</strong>
-          <small>Active Incident</small>
-        </div>
+      <div className="mission-brand-group">
+        <CyberMissionBrand variant="compact" />
+        <span className="mission-incident-status"><i aria-hidden="true" />ACTIVE INCIDENT <span aria-hidden="true">&bull;</span> CYBER BREACH</span>
       </div>
 
       <div className="mission-topbar-meta">

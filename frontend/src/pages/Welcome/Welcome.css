@@ -81,3 +81,21 @@
   .cinematic-home.is-launching::after { display: none; }
   .home-start { transition: none; }
 }
+
+/* The supplied artwork includes a raster logo. Mask only that region, preserving the asset.
+   Coordinates follow the centered cover image (1672 x 941), including viewport cropping. */
+.home-brand {
+  --art-width: max(100vw, 177.683315vh);
+  --art-height: max(100vh, 56.279904vw);
+  position: absolute;
+  left: calc((100vw - var(--art-width)) / 2);
+  top: calc((100vh - var(--art-height)) / 2);
+  width: calc(var(--art-width) * .267);
+  height: calc(var(--art-height) * .094);
+  display: flex;
+  align-items: center;
+  padding-left: calc(var(--art-width) * .024);
+  background: linear-gradient(100deg, #02080dfc 88%, #02080d00), linear-gradient(#02080d, #02080df5 85%, #02080d00);
+}
+.home-brand .cyber-brand { font-size: calc(var(--art-width) * .014); }
+.home-duration span { font-size: var(--type-label); letter-spacing: var(--tracking-label); }

@@ -1,4 +1,11 @@
 :root {
+  --type-brand: clamp(20px, 1.55vw, 28px);
+  --type-station-title: clamp(34px, 3.35vw, 62px);
+  --type-section-title: clamp(28px, 2.35vw, 40px);
+  --type-body: clamp(15px, 1.15vw, 20px);
+  --type-label: 11px;
+  --type-metadata: 12px;
+  --tracking-label: .18em;
   --bg-primary: #03070b;
   --bg-secondary: #050a0f;
   --surface-primary: rgba(7, 19, 29, 0.86);

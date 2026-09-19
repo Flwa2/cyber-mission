@@ -1,3 +1,4 @@
+import CyberMissionBrand from "../../components/CyberMissionBrand/CyberMissionBrand.jsx";
 import FullscreenButton from "../../components/FullscreenButton/FullscreenButton.jsx";
 import { GAME_CONFIG } from "../../config/gameConfig.js";
 import { formatTimer } from "../../hooks/useMissionTimer.js";
@@ -6,6 +7,7 @@ import "./Welcome.css";
 export default function Welcome({ onStartMission, launching = false }) {
   return (
     <main className={`cinematic-home${launching ? " is-launching" : ""}`} aria-label="Cyber Mission welcome" aria-busy={launching}>
+      <div className="home-brand"><CyberMissionBrand /></div>
       <div className="home-hud">
         <div className="home-duration" aria-label="Mission duration: eight minutes">
           <span>MISSION TIME</span>

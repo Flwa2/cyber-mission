@@ -47,9 +47,9 @@
 .station-brief-panel { gap: 24px; }
 .station-brief-panel > .eyebrow { color: #83aabd; letter-spacing: .27em; font-size: 12px; margin: 0; padding-bottom: 20px; position: relative; }
 .station-brief-panel > .eyebrow::after { content: ""; position: absolute; left: 0; bottom: 0; width: 70%; height: 1px; background: linear-gradient(90deg, #24d1ed 0 24%, #2d6e8240 24%, transparent); }
-.station-brief-panel h1 { font-size: clamp(34px, 3.35vw, 62px); line-height: 1.1; letter-spacing: -.035em; text-shadow: 0 4px 24px #0008; }
+.station-brief-panel h1 { font-size: var(--type-station-title); font-weight: 750; line-height: 1.08; letter-spacing: -.025em; text-shadow: 0 4px 24px #0008; }
 .station-brief-panel h1 span { margin-top: 3px; color: #26d0ee; }
-.station-brief-panel > p:not(.eyebrow) { max-width: 320px; margin: 0; color: #adc6d4; font-size: clamp(15px, 1.15vw, 20px); line-height: 1.6; }
+.station-brief-panel > p:not(.eyebrow) { max-width: 320px; margin: 0; color: #adc6d4; font-size: var(--type-body); line-height: 1.6; }
 .incident-awareness { display: flex; gap: 15px; align-items: flex-start; padding: 20px 18px; margin-top: 12px; border: 1px solid #b6425355; border-left-color: #df4d67aa; border-radius: 6px; background: linear-gradient(110deg, #41121d44, #050a0f99); }
 .incident-awareness > svg { width: 28px; height: 28px; color: #ea677c; flex-shrink: 0; }
 .incident-awareness strong { color: #e39da8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
@@ -57,7 +57,7 @@
 .investigation-panel { position: relative; padding: 24px 0; }
 .investigation-panel::before { content: ""; position: absolute; z-index: -1; inset: -15px -24px; background: linear-gradient(100deg, #05202d55, #020b1311); mask-image: linear-gradient(transparent, black 15% 85%, transparent); }
 .investigation-panel > .eyebrow { font-size: 11px; letter-spacing: .2em; color: #81aec3; padding-left: 12px; border-left: 3px solid #23cde0; }
-.investigation-panel h2 { font-size: clamp(28px, 2.5vw, 42px); letter-spacing: -.01em; margin: 8px 0 12px; }
+.investigation-panel h2 { font-size: var(--type-section-title); font-weight: 700; letter-spacing: -.015em; margin: 8px 0 12px; }
 .investigation-panel > p:not(.eyebrow) { font-size: 16px; color: #9bb9c9; }
 .investigation-status-list { gap: 0; margin: 18px 0 24px; padding: 17px 0; border-top: 1px solid #32819a40; border-bottom: 1px solid #32819a30; }
 .investigation-status-list div, .investigation-status-list .done { padding: 0 12px; border: 0; border-right: 1px solid #32819a30; border-radius: 0; background: transparent; gap: 10px; }
@@ -209,3 +209,11 @@
 .mission-dialog .disabled-form label { font-size: 10px; }
 .mission-dialog .disabled-form input { min-height: 42px; }
 @media (prefers-reduced-motion: reduce) { .mission-dialog { animation: none; } }
+
+/* Product identity stays cyan; incident context is a secondary red signal. */
+.mission-brand-group { display: grid; gap: 3px; flex-shrink: 0; }
+.mission-incident-status { display: flex; align-items: center; gap: 6px; margin-left: 45px; font-size: 8px; letter-spacing: .1em; color: #c3919a; }
+.mission-incident-status i { width: 4px; height: 4px; border-radius: 50%; background: var(--incident-red); }
+.mission-topbar .topbar-data span, .mission-topbar .mission-timer span { font-size: 10px; font-weight: 600; letter-spacing: .12em; color: #90aab9; }
+.mission-topbar .topbar-data strong, .mission-topbar .mission-timer strong { font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: .025em; }
+.mission-topbar .topbar-window-button svg { stroke-width: 1.65; }

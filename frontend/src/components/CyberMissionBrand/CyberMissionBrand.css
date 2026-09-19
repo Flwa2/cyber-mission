@@ -1,0 +1,9 @@
+.cyber-brand { display: flex; align-items: center; gap: .65em; color: var(--accent-primary); font-size: var(--type-brand); flex-shrink: 0; }
+.cyber-brand-mark { width: 2.1em; height: 2.1em; flex-shrink: 0; }
+.cyber-brand-copy { display: grid; gap: .28em; }
+.cyber-brand-name { color: var(--text-primary); font-weight: 750; letter-spacing: .075em; line-height: 1.15; white-space: nowrap; }
+.cyber-brand-name > span { color: var(--accent-primary); }
+.cyber-brand-tagline { color: #96afbd; font-size: .43em; letter-spacing: .18em; white-space: nowrap; }
+.cyber-brand--compact { font-size: 16px; }
+.cyber-brand--compact .cyber-brand-mark { width: 34px; height: 34px; }
+.cyber-brand--icon-only .cyber-brand-mark { width: 1.8em; height: 1.8em; }

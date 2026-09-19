@@ -4,15 +4,15 @@ import { applyAction } from "../utils/scoringEngine.js";
 import { ensureStation01State } from "../utils/station01Engine.js";
 import { storageService } from "./storageService.js";
 
-function createBaseMission() {
+function createBaseMission(prepared = false) {
   const now = new Date().toISOString();
 
   return {
     missionId: generateMissionId(),
     createdAt: now,
-    startedAt: now,
+    startedAt: prepared ? null : now,
     updatedAt: now,
-    status: "active",
+    status: prepared ? "prepared" : "active",
     currentStation: 1,
     completedStations: [],
     hiddenScore: 0,
@@ -37,6 +37,30 @@ function createBaseMission() {
 }
 
 export const missionService = {
+  prepareMission() {
+    const existing = storageService.getActiveMission();
+    if (existing) return existing;
+    const mission = createBaseMission(true);
+    storageService.saveActiveMission(mission);
+    return mission;
+  },
+
+  beginMission() {
+    const prepared = storageService.getActiveMission();
+    if (!prepared || prepared.status !== "prepared" || prepared.startedAt) return prepared;
+    const now = new Date().toISOString();
+    const mission = ensureStation01State(
+      { ...prepared, status: "active", startedAt: now, updatedAt: now },
+      storageService.getLastStation01ScenarioId()
+    );
+    return this.saveMission(mission);
+  },
+
+  cancelPreparation() {
+    if (storageService.getActiveMission()?.status === "prepared") storageService.clearActiveMission();
+    return storageService.getActiveMission();
+  },
+
   createMission() {
     const mission = ensureStation01State(createBaseMission(), storageService.getLastStation01ScenarioId());
     storageService.saveLastStation01ScenarioId(mission.decisions.station01.scenarioId);

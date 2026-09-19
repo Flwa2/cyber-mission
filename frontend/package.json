@@ -7,7 +7,7 @@
     "dev": "vite --configLoader native",
     "build": "vite build --configLoader native",
     "preview": "vite preview",
-    "test": "node scripts/validateStation01.mjs"
+    "test": "node scripts/validateStation01.mjs && node scripts/validateMissionLifecycle.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",

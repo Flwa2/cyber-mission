@@ -3,6 +3,7 @@ import LoadingScreen from "./components/LoadingScreen/LoadingScreen.jsx";
 import { MissionProvider, useMission } from "./context/MissionContext.jsx";
 import FinalResult from "./pages/FinalResult/FinalResult.jsx";
 import Welcome from "./pages/Welcome/Welcome.jsx";
+import MissionBriefing from "./pages/MissionBriefing/MissionBriefing.jsx";
 import StationWaitingScreen from "./components/StationWaitingScreen/StationWaitingScreen.jsx";
 import Station01 from "./stations/Station01/Station01.jsx";
 import Station02 from "./stations/Station02/Station02.jsx";
@@ -11,7 +12,7 @@ import Station04 from "./stations/Station04/Station04.jsx";
 import { STATION_STATUS } from "./utils/stationStatus.js";
 
 function MissionRouter() {
-  const { mission, isLoaded, startMission } = useMission();
+  const { mission, isLoaded, prepareMission, beginMission, cancelPreparation } = useMission();
 
   const [launching, setLaunching] = useState(false);
   const launchLock = useRef(false);
@@ -24,7 +25,7 @@ function MissionRouter() {
   function launchMission() {
     if (launchLock.current) return;
     launchLock.current = true;
-    startMission();
+    beginMission();
     setLaunching(true);
   }
 
@@ -43,7 +44,11 @@ function MissionRouter() {
   }
 
   if (!mission) {
-    return <Welcome onStartMission={launchMission} />;
+    return <Welcome onStartMission={prepareMission} />;
+  }
+
+  if (mission.status === "prepared") {
+    return <MissionBriefing mission={mission} onBegin={launchMission} onBack={cancelPreparation} />;
   }
 
   if (mission.status === "complete") {
@@ -54,7 +59,7 @@ function MissionRouter() {
     case 1:
       return <>
         <Station01 mission={mission} />
-        {launching && <Welcome launching />}
+        {launching && <div className="briefing-launch" role="status">INCIDENT RESPONSE INITIATED</div>}
       </>;
     case 2:
       return <Station02 mission={mission} />;
@@ -65,7 +70,7 @@ function MissionRouter() {
     default:
       return <>
         <Station01 mission={mission} />
-        {launching && <Welcome launching />}
+        {launching && <div className="briefing-launch" role="status">INCIDENT RESPONSE INITIATED</div>}
       </>;
   }
 }

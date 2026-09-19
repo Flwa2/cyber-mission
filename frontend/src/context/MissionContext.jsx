@@ -16,10 +16,18 @@ export function MissionProvider({ children }) {
     () => ({
       mission,
       isLoaded,
-      startMission() {
-        const nextMission = missionService.createMission();
+      prepareMission() {
+        const nextMission = missionService.prepareMission();
         setMission(nextMission);
         return nextMission;
+      },
+      beginMission() {
+        const nextMission = missionService.beginMission();
+        setMission(nextMission);
+        return nextMission;
+      },
+      cancelPreparation() {
+        setMission(missionService.cancelPreparation());
       },
       saveMission(nextMission) {
         const savedMission = missionService.saveMission(nextMission);

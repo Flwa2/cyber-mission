@@ -1,3 +1,4 @@
+import MissionIcon from "../../components/MissionIcon/MissionIcon.jsx";
 import { useEffect, useMemo, useState } from "react";
 import MissionTopBar from "../../components/MissionTopBar/MissionTopBar.jsx";
 import { useMission } from "../../context/MissionContext.jsx";
@@ -104,6 +105,7 @@ export default function Station01({ mission }) {
 
   return (
     <main className="screen station-screen station01-screen">
+      <div className="incident-room" aria-hidden="true"><div className="room-monitor" /><div className="room-beacon" /><div className="room-glass" /><div className="room-desk" /></div>
       <MissionTopBar mission={mission} />
 
       {station01.completedAt && !browserVisible ? (
@@ -117,10 +119,8 @@ export default function Station01({ mission }) {
               <span>Message</span>
             </h1>
             <p>You've received a message. Investigate before you act.</p>
-            <div className="station-focus-status">
-              <span className="focus-dot" aria-hidden="true" />
-              <strong>Active Station</strong>
-              <small>Current screen</small>
+            <div className="incident-awareness">
+              <MissionIcon name="report" /><div><strong>Verify before you act</strong><p>Check the sender, context, and any links before deciding.</p></div>
             </div>
           </aside>
 
@@ -131,7 +131,6 @@ export default function Station01({ mission }) {
               onInspectSender={() => recordInvestigation("inspectSender", "sender")}
               onInspectLink={() => recordInvestigation("inspectLink", "link")}
               onViewDetails={() => recordInvestigation("viewDetails", "details")}
-              onOpenActions={() => setActivePanel("actions")}
             />
           </div>
 
@@ -157,24 +156,24 @@ export default function Station01({ mission }) {
 
             <div className="investigation-card-grid">
               <button type="button" onClick={() => recordInvestigation("inspectSender", "sender")} disabled={isLocked}>
-                <i aria-hidden="true">ID</i>
+                <MissionIcon name="sender" />
                 <span>Inspect Sender</span>
                 <small>Sender information</small>
               </button>
               {scenario.link.exists && (
                 <button type="button" onClick={() => recordInvestigation("inspectLink", "link")} disabled={isLocked}>
-                  <i aria-hidden="true">URL</i>
+                  <MissionIcon name="link" />
                   <span>Inspect Link</span>
                   <small>Destination preview</small>
                 </button>
               )}
               <button type="button" onClick={() => recordInvestigation("viewDetails", "details")} disabled={isLocked}>
-                <i aria-hidden="true">META</i>
+                <MissionIcon name="details" />
                 <span>View Message Details</span>
                 <small>Message metadata</small>
               </button>
               <button type="button" className="decision-card" onClick={() => setActivePanel("actions")} disabled={isLocked}>
-                <i aria-hidden="true">ACT</i>
+                <MissionIcon name="actions" />
                 <span>Message Actions</span>
                 <small>Choose response</small>
               </button>

@@ -1,6 +1,7 @@
+import MissionDialog from "../../components/MissionDialog/MissionDialog.jsx";
 export default function SimulatedBrowser({ scenario, onContinue }) {
   return (
-    <div className="station01-panel-backdrop" role="dialog" aria-modal="true" aria-labelledby="browser-title">
+    <MissionDialog title="Secured Booth Browser" onClose={onContinue} className="browser-dialog">
       <section className="sim-browser">
         <div className="browser-topbar">
           <span />
@@ -27,7 +28,7 @@ export default function SimulatedBrowser({ scenario, onContinue }) {
           </button>
         </div>
       </section>
-    </div>
+    </MissionDialog>
   );
 }
 

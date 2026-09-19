@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import CyberMissionBrand from "../../components/CyberMissionBrand/CyberMissionBrand.jsx";
 import FullscreenButton from "../../components/FullscreenButton/FullscreenButton.jsx";
 import MissionIcon from "../../components/MissionIcon/MissionIcon.jsx";
@@ -30,8 +30,8 @@ export default function MissionBriefing({ mission, onBegin, onBack }) {
         <h1 id="briefing-title" tabIndex={-1} ref={title}>MISSION <span>BRIEFING</span></h1>
         <p className="briefing-summary">4 challenges. 8 minutes. One connected incident.</p>
       </section>
-      <ol className="briefing-steps" aria-label="How to play">{steps.map(([icon, heading, copy], index) => <li key={heading}>
-        <div className="briefing-step-symbol"><span>0{index + 1}</span><div className="briefing-icon-ring"><MissionIcon name={icon} /></div></div>
+      <ol className="briefing-steps" aria-label="How to play">{steps.map(([icon, heading, copy]) => <li key={heading}>
+        <div className="briefing-step-symbol"><div className="briefing-icon-ring"><MissionIcon name={icon} /></div></div>
         <h2>{heading}</h2><p>{copy}</p>
       </li>)}</ol>
       <section className="briefing-route" aria-label="4 connected challenges">

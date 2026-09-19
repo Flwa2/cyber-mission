@@ -6,10 +6,10 @@ import { GAME_CONFIG } from "../../config/gameConfig.js";
 import { formatTimer } from "../../hooks/useMissionTimer.js";
 import "./MissionBriefing.css";
 
-const instructions = [
-  ["details", "COMPLETE EACH CHALLENGE", "Work through four connected situations."],
-  ["actions", "MAKE YOUR DECISION", "Inspect what you see and choose how to respond."],
-  ["link", "YOUR CHOICES CARRY FORWARD", "Earlier decisions may change what appears later."]
+const steps = [
+  ["details", "INVESTIGATE", "Inspect the information before you act."],
+  ["actions", "DECIDE", "Choose the response you believe is safest."],
+  ["continue", "MOVE FORWARD", "Your decision is recorded and the next challenge unlocks."]
 ];
 export default function MissionBriefing({ mission, onBegin, onBack }) {
   const title = useRef(null);
@@ -23,31 +23,41 @@ export default function MissionBriefing({ mission, onBegin, onBack }) {
         <FullscreenButton />
       </div>
     </header>
-    <section className="briefing-content">
-      <div className="briefing-intro">
+    <div className="briefing-content">
+      <section className="briefing-intro">
         <p className="briefing-eyebrow">BEFORE YOU BEGIN</p>
         <h1 id="briefing-title" tabIndex={-1} ref={title}>MISSION <span>BRIEFING</span></h1>
-        <p className="briefing-lead">A cyber incident is unfolding.<br />Complete four connected challenges before time runs out.</p>
+        <p>A cyber incident is unfolding. Complete 4 connected challenges before the {duration} mission timer expires.</p>
         <p className="briefing-support">Your decisions may change what happens next.</p>
-      </div>
-      <section className="briefing-route" aria-labelledby="journey-title">
-        <div className="briefing-route-heading"><h2 id="journey-title">4 CONNECTED CHALLENGES</h2><span>ONE INCIDENT</span></div>
-        <ol>{["START HERE", "UNLOCKS NEXT", "UNLOCKS NEXT", "FINAL STAGE"].map((label, index) => <li key={index}><span>0{index + 1}</span><small>{label}</small></li>)}</ol>
       </section>
-      <div className="briefing-lower">
-        <section className="briefing-how" aria-labelledby="how-title">
-          <h2 id="how-title">HOW THE MISSION WORKS</h2>
-          <div className="briefing-instructions">{instructions.map(([icon, heading, copy]) => <article key={heading}><MissionIcon name={icon} /><div><h3>{heading}</h3><p>{copy}</p></div></article>)}</div>
-          <aside className="briefing-note"><MissionIcon name="report" /><div><h3>YOUR DECISIONS MATTER</h3><p>What you do in one challenge may affect what happens later.</p></div></aside>
-        </section>
-        <section className="briefing-time" aria-label="Mission time and start">
-          <div className="briefing-time-heading"><strong>{duration}</strong><span>TOTAL<br />MISSION TIME</span></div>
-          <p>The timer starts only when you press <strong>BEGIN MISSION.</strong></p>
-          <p>Complete all four challenges before time runs out.</p>
-          <div className="briefing-start"><h2>READY TO RESPOND?</h2><button className="briefing-begin" type="button" onClick={onBegin}>BEGIN MISSION <span aria-hidden="true">&rarr;</span></button><small>The {duration} mission timer starts when you begin.</small></div>
-        </section>
-      </div>
-      <button className="briefing-back" type="button" onClick={onBack}><span aria-hidden="true">&larr;</span> BACK TO HOME</button>
-    </section>
+      <section className="briefing-objective" aria-labelledby="objective-title">
+        <h2 id="objective-title">YOUR MISSION</h2>
+        <p className="briefing-objective-main">Complete <strong>4 connected challenges</strong> before the <strong>{duration}</strong> timer expires.</p>
+        <p>Investigate carefully. Decisions made in one challenge may affect what happens later.</p>
+      </section>
+      <section className="briefing-how" aria-labelledby="how-title">
+        <h2 id="how-title">HOW TO PLAY</h2>
+        <ol className="briefing-steps">{steps.map(([icon, heading, copy], index) => <li key={heading}>
+          <span className="briefing-step-number">0{index + 1}</span>
+          <div><h3><MissionIcon name={icon} />{heading}</h3><p>{copy}</p></div>
+        </li>)}</ol>
+      </section>
+      <section className="briefing-route" aria-label="4 connected challenges">
+        <h2>4 CONNECTED CHALLENGES</h2>
+        <ol>{[1, 2, 3, 4].map(number => <li key={number}><span>0{number}</span></li>)}</ol>
+      </section>
+      <section className="briefing-rules" aria-labelledby="rules-title">
+        <h2 id="rules-title">BEFORE YOU BEGIN</h2>
+        <div className="briefing-rule-list">
+          <div><h3>{duration} TOTAL TIME</h3><p>One timer covers the entire mission.</p></div>
+          <div><h3>4 CONNECTED CHALLENGES</h3><p>Complete all four before time expires.</p></div>
+          <div><h3>DECISIONS ARE FINAL</h3><p>Once confirmed, a decision cannot be changed.</p></div>
+        </div>
+      </section>
+      <footer className="briefing-footer">
+        <button className="briefing-back" type="button" onClick={onBack}><span aria-hidden="true">&larr;</span> BACK TO HOME</button>
+        <div className="briefing-start"><button className="briefing-begin" type="button" onClick={onBegin}>BEGIN MISSION <span aria-hidden="true">&rarr;</span></button><p>The {duration} mission timer starts when you press BEGIN MISSION.</p></div>
+      </footer>
+    </div>
   </main>;
 }

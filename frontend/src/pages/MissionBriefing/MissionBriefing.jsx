@@ -3,6 +3,7 @@ import CyberMissionBrand from "../../components/CyberMissionBrand/CyberMissionBr
 import FullscreenButton from "../../components/FullscreenButton/FullscreenButton.jsx";
 import MissionIcon from "../../components/MissionIcon/MissionIcon.jsx";
 import { GAME_CONFIG } from "../../config/gameConfig.js";
+import { SHOW_MISSION_ID } from "../../config/presentationConfig.js";
 import { formatTimer } from "../../hooks/useMissionTimer.js";
 import "./MissionBriefing.css";
 
@@ -19,7 +20,7 @@ export default function MissionBriefing({ mission, onBegin, onBack }) {
     <header className="briefing-chrome">
       <CyberMissionBrand variant="compact" />
       <div className="briefing-chrome-right">
-        <div className="briefing-mission-id"><span>MISSION ID</span><strong>{mission.missionId}</strong></div>
+        {SHOW_MISSION_ID && <div className="briefing-mission-id"><span>MISSION ID</span><strong>{mission.missionId}</strong></div>}
         <FullscreenButton />
       </div>
     </header>
@@ -30,7 +31,7 @@ export default function MissionBriefing({ mission, onBegin, onBack }) {
         <p className="briefing-summary">4 challenges. 8 minutes. One connected incident.</p>
       </section>
       <ol className="briefing-steps" aria-label="How to play">{steps.map(([icon, heading, copy], index) => <li key={heading}>
-        <div className="briefing-step-symbol"><span>0{index + 1}</span><MissionIcon name={icon} /></div>
+        <div className="briefing-step-symbol"><span>0{index + 1}</span><div className="briefing-icon-ring"><MissionIcon name={icon} /></div></div>
         <h2>{heading}</h2><p>{copy}</p>
       </li>)}</ol>
       <section className="briefing-route" aria-label="4 connected challenges">
@@ -38,7 +39,11 @@ export default function MissionBriefing({ mission, onBegin, onBack }) {
         <ol>{[1, 2, 3, 4].map(number => <li key={number}><span>0{number}</span></li>)}</ol>
       </section>
       <div className="briefing-start">
-        <div className="briefing-timer"><strong>{duration} <span>TOTAL TIME</span></strong><p>Timer starts when you begin.</p></div>
+        <div className="briefing-timer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="14" r="8" /><path d="M12 6V2M9 2h6M18 7l2-2M12 10v5l3 2" /></svg>
+          <div className="briefing-duration"><strong>{duration}</strong><span>TOTAL TIME</span></div>
+          <p>The timer starts when you begin.</p>
+        </div>
         <button className="briefing-begin" type="button" onClick={onBegin}>BEGIN MISSION <span aria-hidden="true">&rarr;</span></button>
       </div>
       <button className="briefing-back" type="button" onClick={onBack}><span aria-hidden="true">&larr;</span> BACK TO HOME</button>

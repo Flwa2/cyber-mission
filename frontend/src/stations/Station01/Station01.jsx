@@ -1,3 +1,5 @@
+import { useTranslation } from "../../locales/LanguageProvider.jsx";
+import { localizeDisplay } from "../../locales/translate.js";
 import MissionIcon from "../../components/MissionIcon/MissionIcon.jsx";
 import { useEffect, useMemo, useState } from "react";
 import MissionTopBar from "../../components/MissionTopBar/MissionTopBar.jsx";
@@ -24,14 +26,15 @@ import "./Station01.css";
 const INTRO_DURATION_MS = 600;
 
 export default function Station01({ mission }) {
+  const { t, language } = useTranslation();
   const { updateMission } = useMission();
-  const timer = useMissionTimer(mission.startedAt);
+  const timer = useMissionTimer(mission.startedAt, mission.timer);
   const [introVisible, setIntroVisible] = useState(true);
   const [activePanel, setActivePanel] = useState(null);
   const [browserVisible, setBrowserVisible] = useState(false);
 
   const station01 = mission.decisions?.station01;
-  const scenario = useMemo(() => getParticipantScenario(station01), [station01]);
+  const scenario = useMemo(() => localizeDisplay(getParticipantScenario(station01, language), language), [station01, language]);
   const isLocked = Boolean(station01?.completedAt || station01?.timedOut);
 
   useEffect(() => {
@@ -65,12 +68,6 @@ export default function Station01({ mission }) {
   function commitFinalAction(finalAction) {
     setActivePanel(null);
 
-    if (finalAction === "openLink") {
-      setBrowserVisible(true);
-      updateMission((currentMission) => completeStation01(currentMission, finalAction));
-      return;
-    }
-
     updateMission((currentMission) => completeStation01(currentMission, finalAction));
   }
 
@@ -78,9 +75,9 @@ export default function Station01({ mission }) {
     return (
       <main className="screen center-screen">
         <section className="status-panel">
-          <p className="eyebrow">Station 01</p>
-          <h1>Preparing Message</h1>
-          <p>Loading the station scenario.</p>
+          <p className="eyebrow">{t("Station 01")}</p>
+          <h1>{t("Preparing Message")}</h1>
+          <p>{t("Loading the station scenario.")}</p>
         </section>
       </main>
     );
@@ -93,11 +90,11 @@ export default function Station01({ mission }) {
   if (station01?.timedOut || mission.status === "timed-out") {
     return (
       <main className="screen station-screen">
-        <MissionTopBar mission={mission} />
+        <MissionTopBar currentStation={1} mission={mission} hideIncident={language === "ar"} />
         <section className="station-timeout-card">
-          <p className="eyebrow">Mission Time Expired</p>
-          <h1>Your current mission session has ended.</h1>
-          <p>The final incident assessment will be available in a later phase.</p>
+          <p className="eyebrow">{t("Mission Time Expired")}</p>
+          <h1>{t("Your current mission session has ended.")}</h1>
+          <p>{t("The final incident assessment will be available in a later phase.")}</p>
         </section>
       </main>
     );
@@ -106,22 +103,17 @@ export default function Station01({ mission }) {
   return (
     <main className="screen station-screen station01-screen">
       <div className="incident-room" aria-hidden="true"><div className="room-monitor" /><div className="room-beacon" /><div className="room-glass" /><div className="room-desk" /></div>
-      <MissionTopBar mission={mission} />
+      <MissionTopBar currentStation={1} mission={mission} hideIncident={language === "ar"} />
 
       {station01.completedAt && !browserVisible ? (
         <StationComplete mission={mission} />
       ) : (
-        <section className="station01-layout" aria-label="Station 01 suspicious message investigation">
-          <aside className="station-brief-panel" aria-label="Current station">
-            <p className="eyebrow">Station 01</p>
-            <h1>
-              Suspicious
-              <span>Message</span>
+        <section className="station01-layout" aria-label={t("Station 01 suspicious message investigation")}>
+          <aside className="station-brief-panel" aria-label={t("Current station")}>
+            <p className="eyebrow">{t("Station 01")}</p>
+            <h1>{language === "ar" ? "فحص" : "Message"} <span>{language === "ar" ? "الرسالة" : "Inspection"}</span>
             </h1>
-            <p>You've received a message. Investigate before you act.</p>
-            <div className="incident-awareness">
-              <MissionIcon name="report" /><div><strong>Verify before you act</strong><p>Check the sender, context, and any links before deciding.</p></div>
-            </div>
+            <p>{t("Investigate the message before you act.")}</p>
           </aside>
 
           <div className="phone-stage">
@@ -133,47 +125,36 @@ export default function Station01({ mission }) {
           </div>
 
           <aside className="investigation-panel">
-            <p className="eyebrow">Investigation Workspace</p>
-            <h2>Investigate</h2>
-            <p>Inspect, verify, then decide.</p>
-
-            <div className="investigation-status-list">
-              <div className={station01.senderInspected ? "done" : ""}>
-                <span>Sender</span>
-                <strong>{station01.senderInspected ? "Reviewed" : "Available"}</strong>
-              </div>
-              <div className={station01.linkInspected ? "done" : ""}>
-                <span>Link</span>
-                <strong>{scenario.link.exists ? (station01.linkInspected ? "Reviewed" : "Available") : "No Link"}</strong>
-              </div>
-              <div className={station01.messageDetailsViewed ? "done" : ""}>
-                <span>Message Details</span>
-                <strong>{station01.messageDetailsViewed ? "Reviewed" : "Available"}</strong>
-              </div>
-            </div>
+            {language === "ar" ? <>
+              <h2>{t("station01.workspaceTitle")}</h2>
+              <p className="workspace-instruction">{t("station01.workspaceInstruction")}</p>
+            </> : <>
+              <p className="eyebrow">{t("Investigation Workspace")}</p>
+              <h2>{t("Investigate")}</h2>
+            </>}
 
             <div className="investigation-card-grid">
               <button type="button" onClick={() => recordInvestigation("inspectSender", "sender")} disabled={isLocked}>
                 <MissionIcon name="sender" />
-                <span>Inspect Sender</span>
-                <small>Sender information</small>
+                <span>{t("Inspect Sender")}</span>
+                <small>{t("Sender information")}</small>
               </button>
               {scenario.link.exists && (
                 <button type="button" onClick={() => recordInvestigation("inspectLink", "link")} disabled={isLocked}>
                   <MissionIcon name="link" />
-                  <span>Inspect Link</span>
-                  <small>Destination preview</small>
+                  <span>{t("Inspect Link")}</span>
+                  <small>{t("Destination preview")}</small>
                 </button>
               )}
               <button type="button" onClick={() => recordInvestigation("viewDetails", "details")} disabled={isLocked}>
                 <MissionIcon name="details" />
-                <span>View Message Details</span>
-                <small>Message metadata</small>
+                <span>{t("View Message Details")}</span>
+                <small>{t("Message metadata")}</small>
               </button>
               <button type="button" className="decision-card" onClick={() => setActivePanel("actions")} disabled={isLocked}>
-                <MissionIcon name="actions" />
-                <span>Message Actions</span>
-                <small>Choose response</small>
+                <MissionIcon name={language === "ar" ? "choice" : "actions"} />
+                <span>{t("Take Action")}</span>
+                {language !== "ar" && <small>{t("Choose your response")}</small>}
               </button>
             </div>
           </aside>
@@ -182,7 +163,10 @@ export default function Station01({ mission }) {
 
       {activePanel === "sender" && <SenderInspector scenario={scenario} onClose={() => setActivePanel(null)} />}
       {activePanel === "link" && (
-        <LinkInspector scenario={scenario} onClose={() => setActivePanel(null)} onOpenLink={() => commitFinalAction("openLink")} />
+        <LinkInspector scenario={scenario} onClose={() => setActivePanel(null)} onOpenLink={() => {
+          recordInvestigation("openLink", null);
+          setBrowserVisible(true);
+        }} />
       )}
       {activePanel === "details" && <MessageDetails scenario={scenario} onClose={() => setActivePanel(null)} />}
       {activePanel === "actions" && (

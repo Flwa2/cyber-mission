@@ -1,4 +1,5 @@
 const paths = {
+  choice: "M5 3h14v18H5ZM8 8l2 2 5-5M8 15h8M8 18h5",
   plus: "M12 4v16M4 12h16",
   microphone: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM6 10v2a6 6 0 0 0 12 0v-2M12 18v4M9 22h6",
   sender: "M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2",

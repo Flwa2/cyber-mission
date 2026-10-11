@@ -1,7 +1,9 @@
+import { useTranslation } from "../../locales/LanguageProvider.jsx";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 export default function ExitMissionDialog({ onCancel, onExit }) {
+  const { t, language } = useTranslation();
   const dialogRef = useRef(null);
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -34,12 +36,12 @@ export default function ExitMissionDialog({ onCancel, onExit }) {
       onKeyDown={containKeyboardFocus}
       onCancel={(event) => { event.preventDefault(); onCancel(); }}>
       <div className="exit-marker" aria-hidden="true">!</div>
-      <p className="eyebrow">Exit Mission</p>
-      <h2 id="exit-title">End current mission?</h2>
-      <p id="exit-description">Your current mission progress will be lost.</p>
+      <p className="eyebrow">{t("Exit Mission")}</p>
+      <h2 id="exit-title">{t("End current mission?")}</h2>
+      <p id="exit-description">{t("Your current mission progress will be lost.")}</p>
       <div className="exit-dialog-actions">
-        <button type="button" className="exit-cancel" autoFocus onClick={onCancel}>Cancel</button>
-        <button type="button" className="exit-confirm" onClick={onExit}>Exit Mission</button>
+        <button type="button" className="exit-cancel" autoFocus onClick={onCancel}>{t("Cancel")}</button>
+        <button type="button" className="exit-confirm" onClick={onExit}>{t("Exit Mission")}</button>
       </div>
     </dialog>, document.body
   );

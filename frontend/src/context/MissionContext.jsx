@@ -1,5 +1,8 @@
+import {ACTIVE_MISSION_KEY} from '../services/storageService.js';
+import {INDEPENDENT_MODE} from '../booth/playMode.js';
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { missionService } from "../services/missionService.js";
+import { stationRequest } from "../booth/boothApi.js";
 
 const MissionContext = createContext(null);
 
@@ -10,14 +13,29 @@ export function MissionProvider({ children }) {
   useEffect(() => {
     setMission(missionService.getActiveMission());
     setIsLoaded(true);
+    const syncTab = event => {
+      if (event.key === ACTIVE_MISSION_KEY) setMission(missionService.getActiveMission());
+    };
+    window.addEventListener("storage", syncTab);
+    return () => window.removeEventListener("storage", syncTab);
   }, []);
 
   const value = useMemo(
     () => ({
       mission,
       isLoaded,
-      prepareMission() {
-        const nextMission = missionService.prepareMission();
+      prepareMission(language) {
+        const nextMission = missionService.prepareMission(language);
+        setMission(nextMission);
+        return nextMission;
+      },
+      setPlayerName(playerName) {
+        const nextMission = missionService.setPlayerName(playerName);
+        setMission(nextMission);
+        return nextMission;
+      },
+      setAvatarId(avatarId) {
+        const nextMission = missionService.setAvatarId(avatarId);
         setMission(nextMission);
         return nextMission;
       },
@@ -42,12 +60,26 @@ export function MissionProvider({ children }) {
       },
       updateMission(updater) {
         if (!mission) return null;
-        const nextMission = typeof updater === "function" ? updater(mission) : updater;
+        const current = missionService.getActiveMission();
+        if (current?.missionId !== mission.missionId) { setMission(current); return current; }
+        const nextMission = typeof updater === "function" ? updater(current) : updater;
         const savedMission = missionService.saveMission(nextMission);
         setMission(savedMission);
         return savedMission;
       },
-      resetMission() {
+      detachMission(expectedId = mission?.missionId) {
+        const current = missionService.getActiveMission();
+        if (current?.missionId !== expectedId) { setMission(current); return; }
+        missionService.clearMission();
+        setMission(null);
+      },
+      async resetMission() {
+        if (mission?.startedAt && !INDEPENDENT_MODE) {
+          try {
+            const result = await stationRequest("release", { missionId: mission.missionId, immediate: true });
+            if (!result.released) return;
+          } catch { return; }
+        }
         missionService.clearMission();
         setMission(null);
       }

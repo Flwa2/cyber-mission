@@ -1,0 +1,22 @@
+﻿.leaderboard-screen{position:relative;isolation:isolate;overflow:hidden;background:#030a12;color:#edf7fc;display:flex;flex-direction:column;padding:0 clamp(24px,5vw,96px)}
+.lb-wallpaper{position:absolute;inset:0;z-index:-2;background:url('/assets/cyber-mission-home.png') center/cover no-repeat}
+.has-players .lb-wallpaper{inset:-24px;filter:blur(13px)}
+.leaderboard-screen.has-players::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#020912b3,#020a1399,#020912b3)}
+.lb-header{height:80px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #7ecde328}
+.lb-header>div:last-child{display:flex;align-items:center;gap:16px}.lb-language{min-height:44px;background:transparent;border:0;color:#c5e6f2;cursor:pointer}
+.lb-content{width:min(1120px,100%);margin:0 auto;flex:1;min-height:0;display:flex;flex-direction:column;padding:22px 0 12px}
+.lb-title{padding:8px 0 24px}.lb-title h1{font-size:clamp(26px,3vw,44px);line-height:1.2;margin:0}
+.lb-list{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;gap:6px;overflow-y:auto;overflow-x:hidden;overflow-anchor:none;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#397080 #091923;scrollbar-gutter:stable}.lb-row{display:grid;grid-template-columns:44px 48px minmax(0,1fr) 96px 150px;align-items:center;gap:18px;min-height:68px;flex-shrink:0;padding:4px 18px;border-bottom:1px solid #7fc9df24;background:linear-gradient(90deg,#12304160,#09203125);border-radius:4px}
+.lb-row.lb-podium{min-height:68px;background:linear-gradient(90deg,#173547a8,#0d283966);border-inline-start:2px solid #88bbc550}.lb-rank{text-align:center;color:#92acbb;font-variant-numeric:tabular-nums;font-size:20px}.lb-rank svg{height:49px;width:44px;display:block}.medal-1{color:#f1cf7c}.medal-2{color:#c7d7e2}.medal-3{color:#d69a76}
+.lb-row .player-avatar{width:46px;height:46px;min-width:0}.lb-identity{min-width:0;display:flex;align-items:center}.lb-identity bdi{font-size:clamp(15px,1.4vw,21px);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;direction:ltr;text-align:center}.lb-segment i{display:block;height:5px;border-radius:3px;background:#203745;border:1px solid #7692a326}.lb-segment small{display:block;margin-top:5px;font-size:10px;color:#96b4c5}.lb-segment.is-complete i{background:#43cddc;border-color:#79e2eb80;box-shadow:0 0 7px #35cddd50}.lb-segment.is-complete small{color:#b9edf1}.lb-score{text-align:end;color:#69e4ff;white-space:nowrap}.lb-score strong{font-size:clamp(22px,2vw,30px);font-variant-numeric:tabular-nums}.lb-score small{font-size:11px;color:#9cb5c4;margin-inline-start:8px}.lb-pagination{height:30px;flex-shrink:0;display:flex;align-items:end;justify-content:space-between;color:#9bb8c9;font-size:12px}.lb-empty{margin:auto;text-align:center;color:#bdd9e6}.lb-empty h2{font-size:25px}.lb-empty p{color:#91aebf}
+@media(max-width:1100px){.lb-header{height:68px}.lb-content{padding-top:14px}.lb-title{padding-bottom:12px}.lb-row{gap:12px;grid-template-columns:44px 46px minmax(0,1fr) 72px 120px}}
+@media(max-width:600px){.leaderboard-screen{padding-inline:12px}.lb-row{grid-template-columns:30px 36px minmax(0,1fr) 40px 80px;gap:6px;padding-inline:6px}.lb-row .player-avatar{width:34px;height:34px}.lb-rank svg{width:30px}.lb-score strong{font-size:20px}.lb-score small{display:block}.lb-title{align-items:start}.lb-status{max-width:100px}.lb-header .cyber-brand{transform:scale(.8);transform-origin:center}}
+
+.lb-score{direction:ltr;display:flex;justify-content:flex-end;align-items:baseline;gap:6px}.lb-score small{margin:0}
+
+.leaderboard-screen:not(.has-players) .lb-header{border-bottom-color:transparent}
+
+.leaderboard-screen:not(.has-players) .lb-header{justify-content:flex-end;direction:ltr}
+.leaderboard-screen:not(.has-players) .lb-header>.cyber-brand{display:none}
+
+.lb-list:focus-visible{outline:1px solid #43cddc;outline-offset:3px}

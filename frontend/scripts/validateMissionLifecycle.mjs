@@ -10,7 +10,10 @@ globalThis.localStorage = {
 
 const prepared = missionService.prepareMission();
 assert.equal(prepared.status, "prepared");
+assert.equal(prepared.language, "ar");
 assert.equal(prepared.startedAt, null);
+assert.equal(prepared.playerName, "");
+assert.equal(prepared.avatarId, "cyber-01");
 assert.deepEqual(prepared.decisions, {});
 assert.equal(localStorage.getItem("cyberMission.lastStation01Scenario"), null);
 assert.deepEqual(missionService.prepareMission(), prepared);
@@ -19,13 +22,27 @@ assert.equal(missionService.cancelPreparation(), null);
 assert.equal(localStorage.getItem("cyberMission.lastStation01Scenario"), null);
 
 const ready = missionService.prepareMission();
+assert.deepEqual(missionService.beginMission(), ready, "a prepared mission without a name cannot start");
+assert.equal(ready.startedAt, null);
+missionService.setPlayerName(" \t  ");
+assert.equal(missionService.beginMission().startedAt, null, "whitespace-only names cannot start");
+assert.throws(() => missionService.setPlayerName("x".repeat(41)), RangeError);
+missionService.setPlayerName("  ريم Player  ");
+assert.equal(missionService.getActiveMission().playerName, "  ريم Player  ", "prepared name is persisted");
+missionService.setAvatarId("cyber-03");
+assert.equal(missionService.getActiveMission().avatarId, "cyber-03", "prepared avatar is persisted");
+assert.throws(() => missionService.setAvatarId("unknown-avatar"), RangeError);
 const active = missionService.beginMission();
 assert.equal(active.missionId, ready.missionId);
 assert.equal(active.createdAt, ready.createdAt);
 assert.equal(active.status, "active");
+assert.equal(active.playerName, "ريم Player", "name is trimmed when mission starts");
+assert.equal(active.avatarId, "cyber-03");
 assert.ok(active.startedAt);
 assert.ok(active.decisions.station01.scenarioId);
 assert.deepEqual(missionService.beginMission(), active);
+assert.deepEqual(missionService.setPlayerName("Changed"), active, "active mission name cannot be changed");
+assert.deepEqual(missionService.setAvatarId("cyber-04"), active, "active mission avatar cannot be changed");
 assert.deepEqual(missionService.prepareMission(), active);
 assert.deepEqual(missionService.cancelPreparation(), active);
 assert.deepEqual(missionService.getActiveMission(), active);

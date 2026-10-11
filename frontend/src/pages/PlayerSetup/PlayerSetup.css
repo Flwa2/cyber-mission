@@ -1,0 +1,30 @@
+.player-setup { position:relative; isolation:isolate; min-height:100dvh; display:flex; flex-direction:column; padding:18px clamp(28px,4vw,80px); color:var(--text-primary); background:radial-gradient(ellipse at 0% 36%,#991d3435,transparent 48%),radial-gradient(ellipse at 98% 58%,#086f962f,transparent 48%),#03080d; }
+.player-setup::before { content:""; position:absolute; z-index:-1; pointer-events:none; inset:11% 0 15%; opacity:.55; background:linear-gradient(90deg,transparent 9%,#cd355521 9.2% 9.4%,transparent 9.6% 89%,#2aaccb19 89.2% 89.4%,transparent 89.6%),repeating-linear-gradient(0deg,transparent 0 72px,#52a8c908 73px 75px),repeating-linear-gradient(90deg,#10283322 0 100px,#0007 103px 111px); mask-image:linear-gradient(90deg,black,transparent 29% 71%,black); }
+.player-setup::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse at center,transparent 35%,#0008),linear-gradient(175deg,transparent 81%,#0005 81.2%,#14344416 82%,#0007); }
+.player-setup-header { display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid #80c9e51a; }
+.player-setup-content { width:min(100%,560px); flex:1; min-height:0; margin:0 auto; padding-block:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; text-align:center; animation:briefing-enter .55s ease-out; }
+.player-setup-intro h1 { margin:0 0 10px; font-size:clamp(32px,3vw,46px); line-height:1.1; font-weight:750; }
+.player-setup-intro h1:focus { outline:none; }
+.player-setup-eyebrow { color:#9dbdce; font-size:12px; letter-spacing:.22em; margin:0 0 10px; }
+.player-setup-intro > p:last-child { max-width:460px; margin:0 auto; color:#bdceda; font-size:clamp(16px,1.2vw,19px); line-height:1.5; }
+.player-setup-identity { display:grid; justify-items:center; gap:10px; }
+.player-setup-avatar-display { width:132px; height:132px; }
+.player-setup-avatar { width:100%; height:100%; }
+.player-setup-change-avatar { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:40px; padding:7px 14px; color:#8fdff0; border:1px solid transparent; border-radius:5px; background:transparent; font:inherit; font-size:15px; cursor:pointer; }
+.player-setup-change-avatar svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.7; }
+.player-setup-change-avatar:hover { border-color:#659bb64f; background:#0b263344; }
+.player-setup-name { display:grid; gap:8px; width:min(100%,400px); text-align:start; }
+.player-setup-name label { color:#c4dce7; font-size:14px; font-weight:650; }
+.player-setup-name input { width:100%; min-height:48px; padding:10px 14px; color:#f1faff; border:1px solid #659bb64f; border-radius:5px; background:#04121bd1; font:inherit; }
+.player-setup-name input::placeholder { color:#819bab; opacity:.7; }
+.player-setup-name input:focus-visible,.player-setup button:focus-visible { outline:2px solid #9ceaff; outline-offset:3px; }
+.player-setup-continue { display:flex; align-items:center; justify-content:center; width:min(100%,400px); min-height:58px; margin-top:2px; padding:14px 24px; color:#f1faff; border:1px solid #38d2ffcf; border-radius:5px; background:#04121bd1; box-shadow:inset 0 0 18px #0db9df0c,0 0 26px #0db9df12; font:inherit; font-size:17px; font-weight:750; cursor:pointer; transition:background .2s,box-shadow .2s,transform .15s; }
+.player-setup-continue:hover:not(:disabled) { background:#092937; box-shadow:0 0 24px #19bde225; }
+.player-setup-continue:active:not(:disabled) { transform:scale(.98); }
+.player-setup-continue:disabled { cursor:not-allowed; opacity:.5; }
+.player-setup-back { align-self:flex-start; min-height:44px; padding:10px 0; border:0; background:transparent; color:#9bb5c6; cursor:pointer; font-size:11px; letter-spacing:.12em; }
+.player-setup-back span { margin-inline-end:12px; }
+.player-avatar-credit { margin:-4px 0 0; color:#819bab; text-align:center; font-size:10px; }
+@media(max-height:720px) and (min-width:701px) { .player-setup { padding-block:10px; } .player-setup-header { padding-bottom:8px; } .player-setup-content { gap:13px; padding-block:12px; } .player-setup-avatar-display { width:112px; height:112px; } .player-setup-identity { gap:4px; } .player-setup-back { min-height:38px; padding-block:7px; } }
+@media(max-width:700px) { .player-setup { padding-inline:22px; } .player-setup-content { gap:18px; padding-block:20px; } .player-setup-avatar-display { width:120px; height:120px; } .player-setup-back { align-self:center; } }
+@media(prefers-reduced-motion:reduce) { .player-setup-content { animation:none; } .player-setup-continue { transition:none; } }

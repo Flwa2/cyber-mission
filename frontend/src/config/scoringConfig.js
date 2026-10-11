@@ -3,19 +3,19 @@ export const ACTION_RULES = {
     scoreDelta: 5
   },
   STATION01_INSPECT_SENDER: {
-    scoreDelta: 10,
+    scoreDelta: 100,
     oncePerMission: true
   },
   STATION01_INSPECT_LINK: {
-    scoreDelta: 15,
+    scoreDelta: 100,
     oncePerMission: true
   },
   STATION01_VIEW_DETAILS: {
-    scoreDelta: 5,
+    scoreDelta: 100,
     oncePerMission: true
   },
   OPEN_PHISHING_LINK: {
-    scoreDelta: -100,
+    scoreDelta: -400,
     attackStateDelta: 45,
     oncePerMission: true,
     flags: {
@@ -31,7 +31,7 @@ export const ACTION_RULES = {
     }
   },
   CORRECT_PHISHING_REPORT: {
-    scoreDelta: 100,
+    scoreDelta: 700,
     attackStateDelta: -10,
     oncePerMission: true,
     flags: {
@@ -40,11 +40,11 @@ export const ACTION_RULES = {
     }
   },
   CORRECT_LEGITIMATE_CONTINUE: {
-    scoreDelta: 100,
+    scoreDelta: 700,
     oncePerMission: true
   },
   INCORRECT_LEGITIMATE_REPORT: {
-    scoreDelta: -30,
+    scoreDelta: 100,
     oncePerMission: true,
     flags: {
       legitimateMessageReported: true,
@@ -52,7 +52,7 @@ export const ACTION_RULES = {
     }
   },
   DELETE_PHISHING_WITHOUT_REPORT: {
-    scoreDelta: -20,
+    scoreDelta: 200,
     attackStateDelta: 10,
     oncePerMission: true,
     flags: {
@@ -60,7 +60,7 @@ export const ACTION_RULES = {
     }
   },
   STATION01_DISMISS_PHISHING: {
-    scoreDelta: -40,
+    scoreDelta: 100,
     attackStateDelta: 20,
     oncePerMission: true,
     flags: {
@@ -68,16 +68,16 @@ export const ACTION_RULES = {
     }
   },
   STATION01_BLOCK_PHISHING_WITHOUT_REPORT: {
-    scoreDelta: -10,
+    scoreDelta: 350,
     attackStateDelta: 8,
     oncePerMission: true
   },
   STATION01_DELETE_LEGITIMATE: {
-    scoreDelta: -10,
+    scoreDelta: 100,
     oncePerMission: true
   },
   STATION01_BLOCK_LEGITIMATE: {
-    scoreDelta: -20,
+    scoreDelta: 150,
     oncePerMission: true
   },
   STATION01_OPEN_LEGITIMATE_LINK: {

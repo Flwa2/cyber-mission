@@ -433,14 +433,6 @@
   line-height: 1.42;
 }
 
-.investigation-status-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin: 18px 0;
-}
-
-.investigation-status-list div,
 .completion-grid > div,
 .evidence-list div {
   display: flex;
@@ -452,11 +444,6 @@
   background: rgba(255, 255, 255, 0.032);
 }
 
-.investigation-status-list div {
-  display: grid;
-}
-
-.investigation-status-list span,
 .completion-grid span,
 .evidence-list span {
   color: var(--text-muted);
@@ -465,16 +452,10 @@
   text-transform: uppercase;
 }
 
-.investigation-status-list strong,
 .completion-grid strong,
 .evidence-list strong {
   color: var(--text-primary);
   font-size: 0.9rem;
-}
-
-.investigation-status-list .done {
-  border-color: var(--border-active);
-  background: rgba(25, 207, 255, 0.07);
 }
 
 .investigation-card-grid {
@@ -483,7 +464,20 @@
   margin-top: auto;
 }
 
-.investigation-card-grid button,
+.investigation-card-grid button {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  min-height: 76px;
+  padding: 15px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-medium);
+  color: var(--text-primary);
+  background: linear-gradient(180deg, rgba(13, 29, 40, 0.84), rgba(7, 19, 29, 0.84));
+  cursor: pointer;
+  text-align: left;
+}
+
 .action-grid button {
   position: relative;
   display: grid;
@@ -498,7 +492,6 @@
   text-align: left;
 }
 
-.investigation-card-grid button::after,
 .action-grid button::after {
   position: absolute;
   top: 50%;
@@ -533,6 +526,34 @@
   border-color: var(--border-active);
   box-shadow: 0 0 24px rgba(25, 207, 255, 0.14);
   transform: translateY(1px);
+}
+
+.sms-link,
+.inspected-url {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sms-link {
+  display: inline;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  color: var(--accent-primary);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  unicode-bidi: isolate;
+}
+
+.inspected-url {
+  min-width: 0;
+  text-align: left;
+  unicode-bidi: isolate;
 }
 
 .investigation-card-grid .decision-card {
@@ -903,8 +924,7 @@ button:disabled {
     min-height: 640px;
   }
 
-  .completion-grid,
-  .investigation-status-list {
+  .completion-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -941,4 +961,12 @@ button:disabled {
     padding-top: 12px;
     padding-bottom: 12px;
   }
+}
+
+/* Preserve the approved transparent workspace against other stations' generic panel rules. */
+.station01-screen .investigation-panel {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }

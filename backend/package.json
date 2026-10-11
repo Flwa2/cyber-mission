@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test": "node scripts/validatePersistence.mjs && node scripts/validateLeaderboard.mjs && node scripts/validateProgressiveScoring.mjs && node scripts/validateBooth.mjs && node scripts/validateLeases.mjs && node scripts/validateInvestigation.mjs && node scripts/validateCases.mjs && node scripts/validateClassification.mjs && node scripts/validateDataSharing.mjs && node scripts/validateStation04.mjs && node scripts/validateNarrative.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2"
-  },
-  "devDependencies": {}
+    "express": "^4.19.2",
+    "pg": "^8.23.1"
+  }
 }

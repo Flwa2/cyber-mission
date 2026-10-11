@@ -1,285 +1,373 @@
+// Fictional scenarios. Example domains and 202-555-01xx numbers are reserved for examples.
 export const SMS_SCENARIOS = [
   {
-    id: "SMS-PHISH-001",
-    classification: "phishing",
-    category: "Fake IT account verification",
-    sender: {
-      names: ["IT Support", "Account Services", "Access Desk"],
-      displayNumber: "+966 55 742 0186",
-      sourceType: "external",
-      verificationLabel: "Not verified through corporate messaging"
+    "id": "SMS-PHISH-001",
+    "classification": "phishing",
+    "category": "IT support verification",
+    "difficulty": "hard",
+    "sender": {
+      "names": [
+        "IT Support",
+        "Support Desk"
+      ],
+      "displayNumber": "Service Updates",
+      "sourceType": "external",
+      "verificationLabel": "IT Service Desk"
     },
-    messageTemplates: [
-      "We detected unusual access activity on your corporate account. Review your account before {deadline}. Ref {reference}.",
-      "Your account requires verification after a security notice. Review access status before {deadline}. Ref {reference}."
+    "messageTemplates": [
+      "Your support request {ticketNumber} needs a final review. Please check the request summary:",
+      "An update is available for your support request {ticketNumber}. Review the summary:"
     ],
-    link: {
-      exists: true,
-      displayTexts: ["Review Account", "Verify Access"],
-      destinations: ["account-check.example", "access-review.example"],
-      sourceLabel: "External destination",
-      trusted: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://support.example.com/review"
+      ],
+      "destinations": [
+        "https://support-check.example.net/review"
+      ],
+      "sourceLabel": "https://support.example.com",
+      "trusted": false
     },
-    expectedDecision: "report",
-    difficulty: "medium",
-    futureFlags: {
-      accountExposurePossible: true
+    "messageContext": "You have no open support request. Your last request was closed last month.",
+    "expectedDecision": "report",
+    "futureFlags": {
+      "accountExposurePossible": true
     }
   },
   {
-    id: "SMS-PHISH-002",
-    classification: "phishing",
-    category: "Fake HR benefits notification",
-    sender: {
-      names: ["HR Benefits", "People Rewards", "Benefits Desk"],
-      displayNumber: "+966 54 803 2197",
-      sourceType: "external",
-      verificationLabel: "External number not linked to HR notifications"
+    "id": "SMS-PHISH-002",
+    "classification": "phishing",
+    "category": "Employee benefits review",
+    "difficulty": "hard",
+    "sender": {
+      "names": [
+        "Employee Services",
+        "Benefits Desk"
+      ],
+      "displayNumber": "Benefits Desk",
+      "sourceType": "external",
+      "verificationLabel": "People Services"
     },
-    messageTemplates: [
-      "Your {year} benefits selection has a pending update. Confirm eligibility by {deadline}. Case {reference}.",
-      "A benefits document is waiting for review. Confirm your details before {deadline}. Case {reference}."
+    "messageTemplates": [
+      "Your benefits summary is ready for review. Please acknowledge any changes in the employee services portal:",
+      "Please review your benefits summary before the next enrollment window. The employee services notice is available here:"
     ],
-    link: {
-      exists: true,
-      displayTexts: ["Open Benefits Notice", "Confirm Benefits"],
-      destinations: ["people-benefits.example", "benefits-update.example"],
-      sourceLabel: "External destination",
-      trusted: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://people-update.example.net/summary"
+      ],
+      "destinations": [
+        "https://people-update.example.net/summary"
+      ],
+      "sourceLabel": "https://people.example.com",
+      "trusted": false
     },
-    expectedDecision: "report",
-    difficulty: "medium",
-    futureFlags: {
-      accountExposurePossible: true
+    "messageContext": "You have not requested a benefits change. Your usual benefits notices appear in the employee portal.",
+    "expectedDecision": "report",
+    "futureFlags": {
+      "accountExposurePossible": true
     }
   },
   {
-    id: "SMS-PHISH-003",
-    classification: "phishing",
-    category: "Fake delivery notification",
-    sender: {
-      names: ["Courier Desk", "Package Notice", "Delivery Update"],
-      displayNumber: "+966 50 419 6628",
-      sourceType: "external",
-      verificationLabel: "External number with no corporate delivery record"
+    "id": "SMS-PHISH-003",
+    "classification": "phishing",
+    "category": "Delivery rescheduling fee",
+    "difficulty": "easy",
+    "sender": {
+      "names": [
+        "Delivery Updates",
+        "Parcel Service"
+      ],
+      "displayNumber": "+1 202 555 0141",
+      "sourceType": "external",
+      "verificationLabel": "Parcel Alerts"
     },
-    messageTemplates: [
-      "A parcel for {department} is waiting for address confirmation. Update delivery details by {deadline}. Ref {reference}.",
-      "Delivery to your office is on hold. Confirm recipient details before {deadline}. Ref {reference}."
+    "messageTemplates": [
+      "Your office delivery needs rescheduling. Pay a small handling fee before selecting another slot:",
+      "A new delivery slot is available for your office parcel. A handling fee is required to confirm it:"
     ],
-    link: {
-      exists: true,
-      displayTexts: ["Confirm Delivery", "Update Details"],
-      destinations: ["office-delivery.example", "parcel-confirm.example"],
-      sourceLabel: "External destination",
-      trusted: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://ordar.example.net/reschedule"
+      ],
+      "destinations": [
+        "https://ordar.example.net/payment"
+      ],
+      "sourceLabel": "https://order.example.com",
+      "trusted": false
     },
-    expectedDecision: "report",
-    difficulty: "easy",
-    futureFlags: {
-      accountExposurePossible: true
+    "messageContext": "You are not expecting a parcel. Office delivery charges are normally handled by purchasing.",
+    "expectedDecision": "report",
+    "futureFlags": {
+      "accountExposurePossible": true
     }
   },
   {
-    id: "SMS-PHISH-004",
-    classification: "phishing",
-    category: "Fake MFA re-enrollment",
-    sender: {
-      names: ["MFA Center", "Security Enrollment", "Access Verification"],
-      displayNumber: "+966 56 031 8452",
-      sourceType: "external",
-      verificationLabel: "External number outside approved security channel"
+    "id": "SMS-PHISH-004",
+    "classification": "phishing",
+    "category": "MFA approval request without a link",
+    "difficulty": "easy",
+    "sender": {
+      "names": [
+        "Access Support",
+        "Account Support"
+      ],
+      "displayNumber": "+1 202 555 0112",
+      "sourceType": "external",
+      "verificationLabel": "IT Service Desk"
     },
-    messageTemplates: [
-      "MFA enrollment expires today for your workstation access. Re-enroll before {deadline}. Ticket {reference}.",
-      "Your security token needs re-enrollment to avoid access interruption. Complete by {deadline}. Ticket {reference}."
+    "messageTemplates": [
+      "To finish a routine account check, approve the next sign-in prompt even if you did not start it. No reply is needed.",
+      "We are completing an account check. Please approve the next authentication prompt; you do not need to start a sign-in."
     ],
-    link: {
-      exists: true,
-      displayTexts: ["Re-enroll MFA", "Update Token"],
-      destinations: ["mfa-renew.example", "secure-token.example"],
-      sourceLabel: "External destination",
-      trusted: false
+    "link": {
+      "exists": false
     },
-    expectedDecision: "report",
-    difficulty: "hard",
-    futureFlags: {
-      accountExposurePossible: true
+    "messageContext": "You did not start a sign-in or ask for account help. The message asks you to approve a prompt anyway.",
+    "expectedDecision": "report",
+    "futureFlags": {
+      "accountExposurePossible": true
     }
   },
   {
-    id: "SMS-PHISH-005",
-    classification: "phishing",
-    category: "Fake urgent meeting invitation",
-    sender: {
-      names: ["Executive Office", "Board Scheduling", "Meeting Desk"],
-      displayNumber: "+966 53 684 2901",
-      sourceType: "external",
-      verificationLabel: "External sender not verified as an executive channel"
+    "id": "SMS-PHISH-005",
+    "classification": "phishing",
+    "category": "Meeting agenda invitation",
+    "difficulty": "medium",
+    "sender": {
+      "names": [
+        "Meeting Desk",
+        "Board Scheduling"
+      ],
+      "displayNumber": "Calendar Notices",
+      "sourceType": "external",
+      "verificationLabel": "Workplace Scheduling"
     },
-    messageTemplates: [
-      "A confidential meeting brief was shared with {department}. Open the invitation before {deadline}. Ref {reference}.",
-      "You were added to an urgent leadership briefing. Review the agenda before {deadline}. Ref {reference}."
+    "messageTemplates": [
+      "The agenda for your planning meeting is available. Please review it before attending:",
+      "A planning meeting agenda has been shared with you. Review the document ahead of the discussion:"
     ],
-    link: {
-      exists: true,
-      displayTexts: ["Review Invitation", "Open Agenda"],
-      destinations: ["meeting-brief.example", "agenda-review.example"],
-      sourceLabel: "External destination",
-      trusted: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://calendar.example.com/agenda"
+      ],
+      "destinations": [
+        "https://meeting-review.example.net/agenda"
+      ],
+      "sourceLabel": "https://calendar.example.com",
+      "trusted": false
     },
-    expectedDecision: "report",
-    difficulty: "hard",
-    futureFlags: {
-      accountExposurePossible: true
+    "messageContext": "You have no invitation for this meeting on your calendar and have not spoken with its organizer.",
+    "expectedDecision": "report",
+    "futureFlags": {
+      "accountExposurePossible": true
     }
   },
   {
-    id: "SMS-PHISH-006",
-    classification: "phishing",
-    category: "Fake payroll document notification",
-    sender: {
-      names: ["Payroll Documents", "Finance Records", "Salary Services"],
-      displayNumber: "+966 58 217 9044",
-      sourceType: "external",
-      verificationLabel: "External number not used for payroll communications"
+    "id": "SMS-PHISH-006",
+    "classification": "phishing",
+    "category": "Shared payroll document",
+    "difficulty": "hard",
+    "sender": {
+      "names": [
+        "Finance Records",
+        "Payroll Documents"
+      ],
+      "displayNumber": "Document Notices",
+      "sourceType": "external",
+      "verificationLabel": "Payroll Services; this file was shared by someone outside your organization using the name Finance Records."
     },
-    messageTemplates: [
-      "Your salary adjustment document is ready. Review the file before {deadline}. Document {reference}.",
-      "A payroll document requires acknowledgement. Open the secure file before {deadline}. Document {reference}."
+    "messageTemplates": [
+      "Finance Records shared a compensation worksheet with you. Review the document when convenient:",
+      "A compensation worksheet has been shared for your review by Finance Records. View the document:"
     ],
-    link: {
-      exists: true,
-      displayTexts: ["Open Document", "Review Payroll File"],
-      destinations: ["payroll-file.example", "finance-records.example"],
-      sourceLabel: "External destination",
-      trusted: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://files.example.com/shared/payroll"
+      ],
+      "destinations": [
+        "https://files.example.com/shared/payroll"
+      ],
+      "sourceLabel": "https://files.example.com",
+      "trusted": false
     },
-    expectedDecision: "report",
-    difficulty: "medium",
-    futureFlags: {
-      accountExposurePossible: true
+    "messageContext": "You are not expecting a compensation review. The file asks you to change your bank details; you normally do that in the employee portal.",
+    "expectedDecision": "report",
+    "futureFlags": {
+      "accountExposurePossible": true
     }
   },
   {
-    id: "SMS-LEGIT-001",
-    classification: "legitimate",
-    category: "IT maintenance notification",
-    sender: {
-      names: ["IT Service Desk", "Service Desk", "IT Notifications"],
-      displayNumber: "Service Desk",
-      sourceType: "internal",
-      verificationLabel: "Approved internal messaging channel"
+    "id": "SMS-LEGIT-001",
+    "classification": "legitimate",
+    "category": "Internal service interruption",
+    "difficulty": "easy",
+    "sender": {
+      "names": [
+        "Platform Services",
+        "IT Notifications"
+      ],
+      "displayNumber": "IT Updates",
+      "sourceType": "internal",
+      "verificationLabel": "IT Updates"
     },
-    messageTemplates: [
-      "Network maintenance is scheduled for {maintenanceWindow}. No action is required. Notice {reference}.",
-      "Reminder: planned service maintenance will occur {maintenanceWindow}. No action is required. Notice {reference}."
+    "messageTemplates": [
+      "{systemName} will be unavailable {maintenanceWindow}. Save your work before maintenance begins.",
+      "Planned maintenance for {systemName}: {maintenanceWindow}. Please save open work beforehand."
     ],
-    link: {
-      exists: false
+    "link": {
+      "exists": false
     },
-    expectedDecision: "continue",
-    difficulty: "easy"
+    "messageContext": "You use this service. The same maintenance time is posted on the staff noticeboard.",
+    "expectedDecision": "continue"
   },
   {
-    id: "SMS-LEGIT-002",
-    classification: "legitimate",
-    category: "Resolved service ticket",
-    sender: {
-      names: ["IT Service Desk", "Helpdesk Updates", "Support Desk"],
-      displayNumber: "Service Desk",
-      sourceType: "internal",
-      verificationLabel: "Approved internal service channel"
+    "id": "SMS-LEGIT-002",
+    "classification": "legitimate",
+    "category": "IT support ticket update",
+    "difficulty": "medium",
+    "sender": {
+      "names": [
+        "Support Updates",
+        "IT Service Desk"
+      ],
+      "displayNumber": "Service Updates",
+      "sourceType": "external",
+      "verificationLabel": "Service Updates"
     },
-    messageTemplates: [
-      "Ticket {ticketNumber} has been resolved. No further action is required.",
-      "Your support request {ticketNumber} is now closed. Reply through the service portal if the issue continues."
+    "messageTemplates": [
+      "Your support request {ticketNumber} has an update. Please review the technician's note before the ticket closes:",
+      "A technician added a note to your request {ticketNumber}. View the update in the service portal:"
     ],
-    link: {
-      exists: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://support.example.com/ticket"
+      ],
+      "destinations": [
+        "https://support.example.com/ticket"
+      ],
+      "sourceLabel": "https://support.example.com",
+      "trusted": true
     },
-    expectedDecision: "continue",
-    difficulty: "medium"
+    "messageContext": "You opened a support request today and chose SMS updates. Your ticket now has a technician note.",
+    "expectedDecision": "continue"
   },
   {
-    id: "SMS-LEGIT-003",
-    classification: "legitimate",
-    category: "Facilities maintenance notice",
-    sender: {
-      names: ["Facilities", "Building Services", "Facilities Notice"],
-      displayNumber: "Facilities",
-      sourceType: "internal",
-      verificationLabel: "Approved internal facilities channel"
+    "id": "SMS-LEGIT-003",
+    "classification": "legitimate",
+    "category": "Building maintenance",
+    "difficulty": "easy",
+    "sender": {
+      "names": [
+        "Facilities",
+        "Building Services"
+      ],
+      "displayNumber": "Facilities Notices",
+      "sourceType": "internal",
+      "verificationLabel": "Facilities Notices"
     },
-    messageTemplates: [
-      "Facilities maintenance is scheduled near {department} on {maintenanceWindow}. Access routes may be adjusted.",
-      "Building services will inspect the {department} area {maintenanceWindow}. No action is required."
+    "messageTemplates": [
+      "Maintenance near {department} is scheduled for {maintenanceWindow}. Use the signed alternative entrance during the work.",
+      "Building work affects access near {department} {maintenanceWindow}. Follow the posted alternative route."
     ],
-    link: {
-      exists: false
+    "link": {
+      "exists": false
     },
-    expectedDecision: "continue",
-    difficulty: "easy"
+    "messageContext": "A notice at the building entrance lists the same work and alternative entrance.",
+    "expectedDecision": "continue"
   },
   {
-    id: "SMS-LEGIT-004",
-    classification: "legitimate",
-    category: "Approved leave notification",
-    sender: {
-      names: ["People Operations", "HR Services", "Leave Services"],
-      displayNumber: "People Ops",
-      sourceType: "internal",
-      verificationLabel: "Approved internal HR messaging"
+    "id": "SMS-LEGIT-004",
+    "classification": "legitimate",
+    "category": "Package delivery management",
+    "difficulty": "medium",
+    "sender": {
+      "names": [
+        "Parcel Service",
+        "Delivery Updates"
+      ],
+      "displayNumber": "+1 202 555 0144",
+      "sourceType": "external",
+      "verificationLabel": "+1 202 555 0144 (on your order confirmation)"
     },
-    messageTemplates: [
-      "Leave request {reference} has been approved. Details are available in the employee portal.",
-      "Your time-off request {reference} was approved by your manager. No SMS reply is required."
+    "messageTemplates": [
+      "Your office parcel is scheduled for delivery today. Review the delivery window or select a receiving option:",
+      "A delivery window is available for your office parcel. Review the receiving options before dispatch:"
     ],
-    link: {
-      exists: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://order.example.com/delivery"
+      ],
+      "destinations": [
+        "https://order.example.com/delivery"
+      ],
+      "sourceLabel": "https://order.example.com",
+      "trusted": true
     },
-    expectedDecision: "continue",
-    difficulty: "medium"
+    "messageContext": "You ordered office supplies and chose delivery texts. Your order confirmation shows a delivery today.",
+    "expectedDecision": "continue"
   },
   {
-    id: "SMS-LEGIT-005",
-    classification: "legitimate",
-    category: "Internal awareness announcement",
-    sender: {
-      names: ["Security Awareness", "Cyber Awareness", "Security Office"],
-      displayNumber: "Security Office",
-      sourceType: "internal",
-      verificationLabel: "Approved internal security channel"
+    "id": "SMS-LEGIT-005",
+    "classification": "legitimate",
+    "category": "Workplace event registration",
+    "difficulty": "medium",
+    "sender": {
+      "names": [
+        "Workplace Events",
+        "Event Registration"
+      ],
+      "displayNumber": "Event Notices",
+      "sourceType": "external",
+      "verificationLabel": "Event Notices (on your booking receipt)"
     },
-    messageTemplates: [
-      "Security awareness reminder: verify unexpected links before opening them. Session {reference} begins {maintenanceWindow}.",
-      "Cyber awareness briefing starts {maintenanceWindow}. Check the intranet calendar for room details. Ref {reference}."
+    "messageTemplates": [
+      "Please confirm your workshop attendance before the registration window closes. Your booking is available here:",
+      "Your workplace workshop booking is awaiting attendance confirmation. Review your registration:"
     ],
-    link: {
-      exists: false
+    "link": {
+      "exists": true,
+      "displayTexts": [
+        "https://events.example.org/booking"
+      ],
+      "destinations": [
+        "https://events.example.org/booking"
+      ],
+      "sourceLabel": "https://events.example.org",
+      "trusted": true
     },
-    expectedDecision: "continue",
-    difficulty: "medium"
+    "messageContext": "You booked a workshop yesterday. Your receipt says the event organizer will text you to confirm attendance.",
+    "expectedDecision": "continue"
   },
   {
-    id: "SMS-LEGIT-006",
-    classification: "legitimate",
-    category: "Scheduled system update",
-    sender: {
-      names: ["System Updates", "IT Change Notice", "Platform Services"],
-      displayNumber: "IT Updates",
-      sourceType: "internal",
-      verificationLabel: "Approved internal change notification"
+    "id": "SMS-LEGIT-006",
+    "classification": "legitimate",
+    "category": "Employee services appointment",
+    "difficulty": "medium",
+    "sender": {
+      "names": [
+        "Employee Services",
+        "People Operations"
+      ],
+      "displayNumber": "People Services",
+      "sourceType": "internal",
+      "verificationLabel": "People Services"
     },
-    messageTemplates: [
-      "{systemName} update is scheduled for {maintenanceWindow}. Save your work before the maintenance window.",
-      "Planned update for {systemName}: {maintenanceWindow}. No credential confirmation is required."
+    "messageTemplates": [
+      "Your employee services appointment has moved to the next available slot. Check the employee portal before travelling to the office.",
+      "Employee services updated your appointment time. Review the revised slot in the employee portal before attending."
     ],
-    link: {
-      exists: false
+    "link": {
+      "exists": false
     },
-    expectedDecision: "continue",
-    difficulty: "hard"
+    "messageContext": "You booked an employee services appointment and chose text reminders. The employee portal shows the revised appointment time.",
+    "expectedDecision": "continue"
   }
 ];
-

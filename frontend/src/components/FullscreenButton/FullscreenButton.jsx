@@ -1,3 +1,4 @@
+import { useTranslation } from "../../locales/LanguageProvider.jsx";
 import { useEffect, useState } from "react";
 
 function FullscreenIcon({ active }) {
@@ -23,28 +24,31 @@ function FullscreenIcon({ active }) {
 }
 
 export default function FullscreenButton() {
+  const { t } = useTranslation();
   const [active, setActive] = useState(Boolean(document.fullscreenElement));
   const [error, setError] = useState("");
   useEffect(() => {
     const sync = () => setActive(Boolean(document.fullscreenElement));
     document.addEventListener("fullscreenchange", sync);
+    sync();
     return () => document.removeEventListener("fullscreenchange", sync);
   }, []);
   async function toggle() {
     try {
       setError("");
       if (document.fullscreenElement) await document.exitFullscreen();
-      else await document.documentElement.requestFullscreen?.();
+      else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+      else throw new Error("Fullscreen API unavailable");
     } catch {
       setError("Fullscreen unavailable. Use your browser's fullscreen control.");
     }
   }
   return <>
-    <button type="button" className="topbar-window-button" onClick={toggle}
-      aria-label={active ? "Exit fullscreen" : "Enter fullscreen"}
-      title={active ? "Exit fullscreen" : "Enter fullscreen"}>
+    <button type="button" className="topbar-window-button" data-fullscreen-control aria-pressed={active} onClick={toggle}
+      aria-label={t(active ? "Exit fullscreen" : "Enter fullscreen")}
+      title={t(active ? "Exit fullscreen" : "Enter fullscreen")}>
       <FullscreenIcon active={active} />
     </button>
-    {error && <span role="status" className="fullscreen-error">{error}</span>}
+    {error && <span role="status" className="fullscreen-error">{t(error)}</span>}
   </>;
 }

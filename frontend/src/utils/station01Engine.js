@@ -1,4 +1,5 @@
 import { SMS_SCENARIOS } from "../data/smsScenarios.js";
+import { ACTIVE_SMS_SCENARIOS } from "../data/activeSmsScenarios.js";
 import { applyAction } from "./scoringEngine.js";
 
 const DEPARTMENTS = ["Finance", "Operations", "People Services", "IT", "Facilities", "Procurement"];
@@ -38,40 +39,59 @@ function applyTemplate(template, variables) {
   return template.replace(/\{(\w+)\}/g, (_, key) => variables[key] || "");
 }
 
-export function getScenarioById(scenarioId) {
-  return SMS_SCENARIOS.find((scenario) => scenario.id === scenarioId) || null;
+function getCatalog(catalogVersion) {
+  return catalogVersion === "v2" ? ACTIVE_SMS_SCENARIOS : SMS_SCENARIOS;
+}
+
+function chooseLocale(value, language = "en") {
+  if (!value || typeof value !== "object") return value;
+  return value[language] || value.en || value.ar || "";
+}
+
+function formatValue(value, variables) {
+  return applyTemplate(value, variables);
+}
+
+export function getScenarioById(scenarioId, catalogVersion) {
+  return getCatalog(catalogVersion).find((scenario) => scenario.id === scenarioId) ||
+    ACTIVE_SMS_SCENARIOS.find((scenario) => scenario.id === scenarioId) ||
+    null;
 }
 
 export function createStation01State(previousScenarioId) {
-  const availableScenarios =
-    SMS_SCENARIOS.length > 1 ? SMS_SCENARIOS.filter((scenario) => scenario.id !== previousScenarioId) : SMS_SCENARIOS;
+  const availableScenarios = ACTIVE_SMS_SCENARIOS.length > 1
+    ? ACTIVE_SMS_SCENARIOS.filter((scenario) => scenario.id !== previousScenarioId)
+    : ACTIVE_SMS_SCENARIOS;
   const scenario = pick(availableScenarios);
   const variables = {
-    deadline: pick(["2:00 PM", "end of day", "the next hour", "today"]),
-    department: pick(DEPARTMENTS),
-    maintenanceWindow: makeMaintenanceWindow(),
-    reference: makeReference(scenario.classification === "phishing" ? "SEC" : "REF"),
-    systemName: pick(SYSTEMS),
-    ticketNumber: makeReference("INC"),
-    year: "2026"
+    trackingNumber: `SA-${variablesNumber()}`,
+    orderNumber: `SA-${variablesNumber()}`
   };
-  const message = applyTemplate(pick(scenario.messageTemplates), variables);
+  const messageTemplate = pick(scenario.messageTemplates);
+  const sender = pick(scenario.sender.names);
   const link = scenario.link.exists
     ? {
-        exists: true,
-        displayText: pick(scenario.link.displayTexts),
-        destination: pick(scenario.link.destinations),
-        sourceLabel: scenario.link.sourceLabel
-      }
+      exists: true,
+      displayText: formatValue(pick(scenario.link.displayTexts), variables),
+      destination: formatValue(pick(scenario.link.destinations), variables),
+      sourceLabel: scenario.link.sourceLabel
+    }
     : { exists: false };
 
   return {
     scenarioId: scenario.id,
+    catalogVersion: "v2",
     assignedAt: new Date().toISOString(),
     receivedAt: makeTimestamp(),
-    senderName: pick(scenario.sender.names),
+    senderName: chooseLocale(sender),
+    senderNameByLanguage: sender,
     senderDisplayNumber: scenario.sender.displayNumber,
-    message,
+    message: formatValue(messageTemplate.en, variables),
+    messageByLanguage: {
+    en: formatValue(messageTemplate.en, variables),
+    ar: formatValue(messageTemplate.ar, variables)
+    },
+    messageContextByLanguage: scenario.messageContext,
     link,
     senderInspected: false,
     linkInspected: false,
@@ -86,8 +106,12 @@ export function createStation01State(previousScenarioId) {
   };
 }
 
-export function getParticipantScenario(station01State) {
-  const scenario = getScenarioById(station01State?.scenarioId);
+function variablesNumber() {
+  return String(100000 + getRandomInt(900000));
+}
+
+export function getParticipantScenario(station01State, language = "en") {
+  const scenario = getScenarioById(station01State?.scenarioId, station01State?.catalogVersion);
 
   if (!scenario || !station01State) {
     return null;
@@ -96,12 +120,15 @@ export function getParticipantScenario(station01State) {
   return {
     id: scenario.id,
     sender: {
-      name: station01State.senderName,
+      name: station01State.senderNameByLanguage?.[language] || station01State.senderName,
       displayNumber: station01State.senderDisplayNumber,
       sourceType: scenario.sender.sourceType,
-      verificationLabel: scenario.sender.verificationLabel
+      verificationLabel: chooseLocale(scenario.sender.verificationLabel, language)
     },
-    message: station01State.message,
+    message: station01State.messageByLanguage?.[language] || station01State.message,
+    messageContext: station01State.messageContextByLanguage
+      ? chooseLocale(station01State.messageContextByLanguage, language)
+      : chooseLocale(scenario.messageContext, language),
     timestamp: station01State.receivedAt,
     link: station01State.link,
     difficulty: scenario.difficulty
@@ -147,12 +174,15 @@ export function recordStation01Investigation(mission, actionName) {
   const patchByAction = {
     inspectSender: { senderInspected: true },
     inspectLink: { linkInspected: true },
-    viewDetails: { messageDetailsViewed: true }
+    viewDetails: { messageDetailsViewed: true },
+    openLink: { linkOpened: true }
   };
   const scoreActionByAction = {
     inspectSender: "STATION01_INSPECT_SENDER",
     inspectLink: "STATION01_INSPECT_LINK",
-    viewDetails: "STATION01_VIEW_DETAILS"
+    viewDetails: "STATION01_VIEW_DETAILS",
+    openLink: getScenarioById(station01.scenarioId, station01.catalogVersion)?.classification === "phishing"
+      ? "OPEN_PHISHING_LINK" : "STATION01_OPEN_LEGITIMATE_LINK"
   };
   const patch = patchByAction[actionName];
 
@@ -175,7 +205,7 @@ export function recordStation01Investigation(mission, actionName) {
 
 export function completeStation01(mission, finalAction) {
   const station01 = mission.decisions.station01;
-  const scenario = getScenarioById(station01.scenarioId);
+  const scenario = getScenarioById(station01.scenarioId, station01.catalogVersion);
 
   if (!scenario || station01.completedAt || station01.timedOut) {
     return mission;
@@ -255,4 +285,3 @@ export function expireStation01(mission) {
     updatedAt: new Date().toISOString()
   };
 }
-

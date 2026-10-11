@@ -10,6 +10,6 @@ export const GAME_CONFIG = {
     1: "Suspicious Message",
     2: "The Desk",
     3: "Digital Investigation",
-    4: "Connect the Evidence"
+    4: "Solve the Case"
   }
 };

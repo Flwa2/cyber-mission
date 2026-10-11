@@ -1,3 +1,4 @@
+import { useTranslation } from "../../locales/LanguageProvider.jsx";
 import MissionTopBar from "../MissionTopBar/MissionTopBar.jsx";
 import { STATION_STATUS, STATIONS } from "../../utils/stationStatus.js";
 import MissionTimer from "../MissionTimer/MissionTimer.jsx";
@@ -11,6 +12,7 @@ const statusCopy = {
 };
 
 export default function StationWaitingScreen({ mission, stationNumber = 2, status = STATION_STATUS.WAITING }) {
+  const { t, language } = useTranslation();
   const station = STATIONS.find((item) => item.number === stationNumber) || STATIONS[1];
   const previousStation = Math.max(1, station.number - 1);
   const isReady = status === STATION_STATUS.READY || status === STATION_STATUS.ACTIVE;
@@ -23,8 +25,8 @@ export default function StationWaitingScreen({ mission, stationNumber = 2, statu
         <div className="incident-identity large">
           <span className="incident-flag" aria-hidden="true" />
           <div>
-            <strong>Cyber Breach</strong>
-            <small>Active Incident</small>
+            <strong>{t("Cyber Breach")}</strong>
+            <small>{t("Active Incident")}</small>
           </div>
         </div>
 
@@ -34,26 +36,26 @@ export default function StationWaitingScreen({ mission, stationNumber = 2, statu
         </div>
 
         <div className="waiting-copy">
-          <p className="eyebrow">Station {String(station.number).padStart(2, "0")}</p>
-          <h1>{station.name}</h1>
+          <p className="eyebrow">{t("Station")} {String(station.number).padStart(2, "0")}</p>
+          <h1>{t(station.name)}</h1>
           <p>
-            {isCompleted
+            {t(isCompleted
               ? "Station state recorded."
               : isReady
                 ? "This screen is ready for the next participant action."
-                : `Awaiting Station ${String(previousStation).padStart(2, "0")}.`}
+                : `Awaiting Station ${String(previousStation).padStart(2, "0")}.`)}
           </p>
         </div>
 
         <div className="waiting-meta">
           <div>
-            <span>Mission</span>
+            <span>{t("Mission")}</span>
             <strong>{mission?.missionId || "CM-PREVIEW"}</strong>
           </div>
-          {mission?.startedAt && <MissionTimer startedAt={mission.startedAt} />}
+          {mission?.startedAt && <MissionTimer startedAt={mission.startedAt} timer={mission.timer} />}
           <div>
-            <span>Status</span>
-            <strong>{statusCopy[status]}</strong>
+            <span>{t("Status")}</span>
+            <strong>{t(statusCopy[status])}</strong>
           </div>
         </div>
       </section>

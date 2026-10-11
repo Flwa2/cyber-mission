@@ -3,12 +3,26 @@ import { generateMissionId } from "../utils/generateMissionId.js";
 import { applyAction } from "../utils/scoringEngine.js";
 import { ensureStation01State } from "../utils/station01Engine.js";
 import { storageService } from "./storageService.js";
+import { normalizeLanguage } from "../../../shared/language.mjs";
+import { PLAYER_AVATAR_IDS } from "../../../shared/playerAvatars.mjs";
 
-function createBaseMission(prepared = false) {
+const MAX_PLAYER_NAME_LENGTH = 40;
+
+function ensurePreparedAvatar(mission) {
+  if (mission?.status !== "prepared" || PLAYER_AVATAR_IDS.includes(mission.avatarId)) return mission;
+  const updatedMission = { ...mission, avatarId: PLAYER_AVATAR_IDS[0] };
+  storageService.saveActiveMission(updatedMission);
+  return updatedMission;
+}
+
+function createBaseMission(prepared = false, language) {
   const now = new Date().toISOString();
 
   return {
     missionId: generateMissionId(),
+    language: normalizeLanguage(language),
+    playerName: "",
+    avatarId: PLAYER_AVATAR_IDS[0],
     createdAt: now,
     startedAt: prepared ? null : now,
     updatedAt: now,
@@ -37,10 +51,29 @@ function createBaseMission(prepared = false) {
 }
 
 export const missionService = {
-  prepareMission() {
-    const existing = storageService.getActiveMission();
+  prepareMission(language) {
+    const existing = ensurePreparedAvatar(storageService.getActiveMission());
     if (existing) return existing;
-    const mission = createBaseMission(true);
+    const mission = createBaseMission(true, language);
+    storageService.saveActiveMission(mission);
+    return mission;
+  },
+
+  setPlayerName(playerName) {
+    if (typeof playerName !== "string") throw new TypeError("Player name must be a string");
+    if (playerName.length > MAX_PLAYER_NAME_LENGTH) throw new RangeError("Player name must be 40 characters or fewer");
+    const prepared = storageService.getActiveMission();
+    if (!prepared || prepared.status !== "prepared") return prepared;
+    const mission = { ...prepared, playerName, updatedAt: new Date().toISOString() };
+    storageService.saveActiveMission(mission);
+    return mission;
+  },
+
+  setAvatarId(avatarId) {
+    if (!PLAYER_AVATAR_IDS.includes(avatarId)) throw new RangeError("Unknown player avatar");
+    const prepared = storageService.getActiveMission();
+    if (!prepared || prepared.status !== "prepared") return prepared;
+    const mission = { ...prepared, avatarId, updatedAt: new Date().toISOString() };
     storageService.saveActiveMission(mission);
     return mission;
   },
@@ -48,9 +81,12 @@ export const missionService = {
   beginMission() {
     const prepared = storageService.getActiveMission();
     if (!prepared || prepared.status !== "prepared" || prepared.startedAt) return prepared;
+    const playerName = typeof prepared.playerName === "string" ? prepared.playerName.trim() : "";
+    if (!playerName || playerName.length > MAX_PLAYER_NAME_LENGTH) return prepared;
+    const avatarId = PLAYER_AVATAR_IDS.includes(prepared.avatarId) ? prepared.avatarId : PLAYER_AVATAR_IDS[0];
     const now = new Date().toISOString();
     const mission = ensureStation01State(
-      { ...prepared, status: "active", startedAt: now, updatedAt: now },
+      { ...prepared, playerName, avatarId, status: "active", startedAt: now, updatedAt: now },
       storageService.getLastStation01ScenarioId()
     );
     return this.saveMission(mission);
@@ -61,15 +97,15 @@ export const missionService = {
     return storageService.getActiveMission();
   },
 
-  createMission() {
-    const mission = ensureStation01State(createBaseMission(), storageService.getLastStation01ScenarioId());
+  createMission(language) {
+    const mission = ensureStation01State(createBaseMission(false, language), storageService.getLastStation01ScenarioId());
     storageService.saveLastStation01ScenarioId(mission.decisions.station01.scenarioId);
     storageService.saveActiveMission(mission);
     return mission;
   },
 
   getActiveMission() {
-    return storageService.getActiveMission();
+    return ensurePreparedAvatar(storageService.getActiveMission());
   },
 
   saveMission(mission) {

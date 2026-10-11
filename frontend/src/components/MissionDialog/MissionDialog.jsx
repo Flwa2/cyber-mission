@@ -1,8 +1,10 @@
+import { useTranslation } from "../../locales/LanguageProvider.jsx";
 import { useEffect, useRef, useId } from "react";
 import { createPortal } from "react-dom";
 import MissionIcon from "../MissionIcon/MissionIcon.jsx";
 
 export default function MissionDialog({ title, children, onClose, className = "" }) {
+  const { t, language } = useTranslation();
   const ref = useRef(null);
   const titleId = useId();
   useEffect(() => {
@@ -24,8 +26,8 @@ export default function MissionDialog({ title, children, onClose, className = ""
   return createPortal(<dialog ref={ref} className={`mission-dialog ${className}`} aria-labelledby={titleId}
     onKeyDown={trapFocus} onCancel={(event) => { event.preventDefault(); onClose(); }}>
     <header className="panel-header">
-      <div><span className="dialog-kicker">CYBER MISSION / INVESTIGATION</span><h2 id={titleId}>{title}</h2></div>
-      <button type="button" className="panel-close" onClick={onClose} aria-label="Close panel"><MissionIcon name="close" /></button>
+      <div><span className="dialog-kicker">{t("CYBER MISSION / INVESTIGATION")}</span><h2 id={titleId}>{title}</h2></div>
+      <button type="button" className="panel-close" onClick={onClose} aria-label={t("Close panel")}><MissionIcon name="close" /></button>
     </header>
     <div className="panel-content">{children}</div>
   </dialog>, document.body);

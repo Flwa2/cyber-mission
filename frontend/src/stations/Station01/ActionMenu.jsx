@@ -1,3 +1,4 @@
+import { useTranslation } from "../../locales/LanguageProvider.jsx";
 import InspectorPanel from "./InspectorPanel.jsx";
 import MissionIcon from "../../components/MissionIcon/MissionIcon.jsx";
 const choices = [
@@ -7,10 +8,11 @@ const choices = [
   ["continue", "Continue / Dismiss", "No further action on this message"]
 ];
 export default function ActionMenu({ onClose, onAction }) {
-  return <InspectorPanel title="Message Actions" onClose={onClose}>
+  const { t, language } = useTranslation();
+  return <InspectorPanel title={t("Message Actions")} onClose={onClose}>
     <div className="action-grid">{choices.map(([action, title, description]) =>
       <button type="button" key={action} onClick={() => onAction(action)}>
-        <MissionIcon name={action} /><span>{title}</span><small>{description}</small><MissionIcon name="continue" className="row-arrow" />
+        <MissionIcon name={action} /><span>{t(title)}</span><small>{t(description)}</small><MissionIcon name="continue" className="row-arrow" />
       </button>
     )}</div>
   </InspectorPanel>;

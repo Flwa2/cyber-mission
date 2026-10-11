@@ -1,27 +1,20 @@
+import { useTranslation } from "../../locales/LanguageProvider.jsx";
 import InspectorPanel from "./InspectorPanel.jsx";
 
 export default function MessageDetails({ scenario, onClose }) {
+  const { t } = useTranslation();
   return (
-    <InspectorPanel title="Message Details" onClose={onClose}>
+    <InspectorPanel title={t("Message Details")} onClose={onClose}>
       <div className="evidence-list">
         <div>
-          <span>Received</span>
+          <span>{t("Received")}</span>
           <strong>{scenario.timestamp}</strong>
         </div>
         <div>
-          <span>Sender</span>
-          <strong>{scenario.sender.name}</strong>
-        </div>
-        <div>
-          <span>Channel</span>
-          <strong>SMS</strong>
-        </div>
-        <div>
-          <span>Source</span>
-          <strong>{scenario.sender.sourceType === "internal" ? "Internal messaging service" : "External number"}</strong>
+          <span>{t("Context")}</span>
+          <strong>{scenario.messageContext || t(scenario.sender.sourceType === "internal" ? "Internal messaging service" : "External number")}</strong>
         </div>
       </div>
     </InspectorPanel>
   );
 }
-

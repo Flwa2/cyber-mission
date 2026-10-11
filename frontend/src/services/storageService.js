@@ -1,4 +1,5 @@
-const ACTIVE_MISSION_KEY = "cyberMission.activeMission";
+import {INDEPENDENT_MODE} from '../booth/playMode.js';
+export const ACTIVE_MISSION_KEY = INDEPENDENT_MODE ? "cyberMission.independentMission" : "cyberMission.activeMission";
 const LAST_STATION01_SCENARIO_KEY = "cyberMission.lastStation01Scenario";
 
 export const storageService = {

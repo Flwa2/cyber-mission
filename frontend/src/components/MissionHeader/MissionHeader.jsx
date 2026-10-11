@@ -14,7 +14,7 @@ export default function MissionHeader({ mission }) {
             <span>Mission ID</span>
             <strong>{mission.missionId}</strong>
           </div>
-          <MissionTimer startedAt={mission.startedAt} />
+          <MissionTimer startedAt={mission.startedAt} timer={mission.timer} />
         </div>
       )}
     </header>

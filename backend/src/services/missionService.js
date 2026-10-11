@@ -1,33 +1,41 @@
 import { createMissionRecord } from "../models/Mission.js";
 
-const missions = new Map();
+import { persistentStore } from "../persistentStore.js";
 
 export const missionService = {
   createMission({ missionId }) {
-    const mission = createMissionRecord({ missionId });
-    missions.set(mission.missionId, mission);
-    return mission;
+    return persistentStore.transaction(state => {
+      const missions = state.legacyMissions ||= {};
+      if (Object.hasOwn(missions, missionId)) return missions[missionId];
+      const mission = createMissionRecord({ missionId });
+      Object.defineProperty(missions, missionId, { value:mission, enumerable:true, writable:true, configurable:true });
+      return mission;
+    });
   },
 
   getMission(missionId) {
-    return missions.get(missionId) || null;
+    const missions = persistentStore.read().legacyMissions || {};
+    return Object.hasOwn(missions, missionId) ? missions[missionId] : null;
   },
 
   updateMission(missionId, updates) {
-    const existingMission = missions.get(missionId);
+    return persistentStore.transaction(state => {
+      const missions = state.legacyMissions || {};
+      const existingMission = Object.hasOwn(missions, missionId) ? missions[missionId] : null;
 
-    if (!existingMission) {
-      return null;
-    }
+      if (!existingMission) {
+        return null;
+      }
 
-    const updatedMission = {
-      ...existingMission,
-      ...updates,
-      missionId: existingMission.missionId,
-      updatedAt: new Date().toISOString()
-    };
+      const updatedMission = {
+        ...existingMission,
+        ...updates,
+        missionId: existingMission.missionId,
+        updatedAt: new Date().toISOString()
+      };
 
-    missions.set(missionId, updatedMission);
-    return updatedMission;
+      missions[missionId] = updatedMission;
+      return updatedMission;
+    });
   }
 };

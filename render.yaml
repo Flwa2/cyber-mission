@@ -2,7 +2,7 @@ services:
   - type: web
     name: cyber-mission
     runtime: node
-    plan: free
+    plan: standard
     region: frankfurt
     buildCommand: npm ci --include=dev && npm run build
     startCommand: node backend/src/server.js
@@ -26,5 +26,6 @@ services:
 
 databases:
   - name: cyber-mission-db
-    plan: free
+    plan: basic-1gb
     region: frankfurt
+    postgresMajorVersion: "18"

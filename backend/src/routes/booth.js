@@ -1,5 +1,6 @@
 import { independentContext, independentMiddleware, scopedTransaction } from '../independentMode.js';
 import {leaderboardSnapshot} from '../leaderboard.js';
+import {publicEvents,publicEventLeaderboard} from '../events.js';
 import { finalizeStationScore } from '../progressiveScoring.js';
 import { initializeVaultAssignment,recordVaultAction,isVaultReplay } from '../station04Vault.js';
 import { assignCase, publicMission, caseCatalog } from '../caseEngine.js';
@@ -37,14 +38,16 @@ function revisionCheck(r,d,revision) {
  e.conflict={device:d,mission:publicMission(r),revision:r.revision||0};throw e;
 }
 function owned(d,id) { if(d.deviceId && d.deviceId!==id)fail('Station is assigned to another device'); }
-const handle=fn=>(req,res,next)=>{try{res.json(fn(req));}catch(e){next(e);}};
+const handle=fn=>async(req,res,next)=>{try{res.json(await fn(req));}catch(e){next(e);}};
 // Read-only display bypasses lease maintenance and never claims a station.
-router.get('/leaderboard',(req,res)=>res.set('Cache-Control','no-store').json(leaderboardSnapshot(persistentStore.read())));
+router.get('/leaderboard',(req,res)=>{const s=persistentStore.read();res.set('Cache-Control','no-store').json({...leaderboardSnapshot(s),event:publicEvents(s).active});});
+router.get('/events',(req,res)=>res.set('Cache-Control','no-store').json(publicEvents(persistentStore.read())));
+router.get('/events/:id/leaderboard',(req,res,next)=>{try{res.set('Cache-Control','no-store').json(publicEventLeaderboard(persistentStore.read(),req.params.id));}catch(e){e.status?res.status(e.status).json({error:e.message}):next(e);}});
 router.post('/independent/:id/:station/:action',independentMiddleware(persistentStore,publicMission));
 // Cleanup commits even when the following request is rejected. Also runs when
 // every browser is offline; no unload event or competing poll is required.
-router.use((req,res,next)=>{try{if(!independentContext.getStore())transaction(s=>sweepDeviceLeases(s));next();}catch(e){next(e);}});
-setInterval(()=>{try{transaction(s=>sweepDeviceLeases(s));}catch(e){console.error('Device lease cleanup failed:',e.message);}},1000).unref();
+router.use(async(req,res,next)=>{try{if(!independentContext.getStore())await transaction(s=>sweepDeviceLeases(s));next();}catch(e){next(e);}});
+setInterval(async()=>{try{await transaction(s=>sweepDeviceLeases(s));}catch(e){console.error('Device lease cleanup failed:',e.message);}},1000).unref();
 router.post('/stations/:station/heartbeat',handle(req=>transaction(s=>{
  const {station,deviceId}=input(req),d=slot(s,station);
  owned(d,deviceId);
@@ -62,6 +65,7 @@ router.post('/stations/:station/sync',handle(req=>transaction(s=>{
  const m={...incoming,playerName,language:normalizeLanguage(incoming.language)};
  // Case assignment/content/results are server-owned, never accepted from a Station 01 snapshot.
  delete m.scoring;delete m.scoreBreakdown;
+ delete m.station04Result;
  delete m.vaultAssignment;
  delete m.vault;delete m.vaultState;
  delete m.caseId;delete m.caseFile;delete m.caseResult;delete m.narrativeAssignment;
@@ -94,7 +98,7 @@ router.post('/stations/:station/sync',handle(req=>transaction(s=>{
    const e=new Error('A newer mission is saved on the server'); e.status=409;
    e.conflict={mission:publicMission(r),revision:r.revision||0}; throw e;
  }
- r ||= s.missions[m.missionId]={missionId:m.missionId,originDevice:deviceId,stage:1,phase:'ACTIVE',timer:{activeMs:0,activeStartedAt:null}};
+ r ||= s.missions[m.missionId]={missionId:m.missionId,eventId:s.events?.activeEventId,originDevice:deviceId,stage:1,phase:'ACTIVE',timer:{activeMs:0,activeStartedAt:null}};
  if(!unchanged)r.revision=(r.revision||0)+1;
  if(!r.timer)r.timer={activeMs:0,activeStartedAt:null};
  r.mission=structuredClone(m);

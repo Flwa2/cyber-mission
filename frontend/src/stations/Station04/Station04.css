@@ -41,6 +41,9 @@
 .response-scene{height:100dvh;overflow:hidden;isolation:isolate;position:relative;display:flex;flex-direction:column;background:#03111c url('/assets/station04-operations-center.png') center/cover no-repeat;color:#f0f7fc}
 .response-scene::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(2,10,18,.91),rgba(2,12,22,.76) 43%,rgba(2,12,22,.16)),linear-gradient(0deg,rgba(1,10,19,.6),transparent 65%);transition:opacity .3s}
 .response-scene.is-complete::before{opacity:.75}
+.response-verdict{width:100%;padding:14px 18px;border:1px solid #37c6de66;border-radius:12px;background:#071e2be8;text-align:start;box-sizing:border-box}
+.response-verdict p{margin:7px 0;line-height:1.6;font-size:15px}
+.response-verdict small{color:#b7ccd6;line-height:1.5;display:block}
 .response-scene>.mission-topbar{width:100%;max-width:none;margin:0;min-height:70px;padding:10px clamp(20px,3vw,60px);background:rgba(2,11,19,.88);border-bottom:1px solid #94d7f024;flex-shrink:0}
 .response-location{display:flex;align-items:center;justify-content:space-between;padding:18px clamp(24px,4vw,80px);font-size:13px;letter-spacing:.1em;color:#90d9ec}
 .response-location ol{display:flex;gap:16px;list-style:none;margin:0;padding:0;direction:ltr}

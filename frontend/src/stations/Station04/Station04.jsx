@@ -91,6 +91,13 @@ export default function Station04({mission,onAction,busy=false,error='',onExit})
     <span className="response-completion-mark" aria-hidden="true">✓</span>
     <h1 id="response-title" ref={heading} tabIndex={-1}>{copy('MISSION COMPLETE','تم إكمال المهمة')}</h1>
     <p className="response-lead" role="status">{copy('Your response has been submitted successfully.','تم تسجيل استجابتك بنجاح.')}</p>
+    {mission.station04Result&&<section className="response-verdict" aria-label={copy('Investigation result','نتيجة التحقيق')}>
+     <h2>{mission.station04Result.correct?copy('Your choice was correct','اختيارك صحيح'):copy('Your choice was incorrect','اختيارك غير صحيح')}</h2>
+     <p>{copy('Correct suspect','المشتبه به الصحيح')}: <strong>{display(mission.station04Result.correctPerson.name)}</strong></p>
+     <p>{copy('Your choice','اختيارك')}: <strong>{display(mission.station04Result.selectedPerson.name)}</strong></p>
+     <p>{display(mission.station04Result.explanation)}</p>
+     <small>{copy('The records identify the account involved; they do not establish malicious intent.','تحدد السجلات الحساب المرتبط بالنشاط، ولا تثبت وجود نية ضارة.')}</small>
+    </section>}
     {mission.finalScore&&<><h2><bdi dir="ltr">{mission.finalScore.total.toLocaleString(language)} / 5,000</bdi></h2><div className="response-options">{Object.values(mission.finalScore.stations).map((score,index)=><div className="response-option" key={index}><span>{copy(`Station 0${index+1}`,`المحطة 0${index+1}`)}</span><strong><bdi dir="ltr">{score.earned} / {score.maximum}</bdi></strong></div>)}</div><button className="response-primary" onClick={onExit}>{copy('BACK TO HOME','العودة للرئيسية')}</button></>}
    </>:<>
     <p className="response-kicker">{copy(`STEP ${step} OF 3`,`الخطوة ${step} من 3`)}</p>

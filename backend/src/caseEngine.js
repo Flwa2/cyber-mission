@@ -9,6 +9,7 @@ import {publicStation03Experience} from './station03Experience.js';
 import {publicNarrativeAssignment} from '../../shared/narrativeAssignment.mjs';
 import {publicVault} from './station04VaultFlow.js';
 import {missionTimerSnapshot} from './missionTimer.js';
+import {station04Result} from './station04Result.js';
 
 export function assignCase(state, record) {
  if(record.caseAssignment)return;
@@ -69,6 +70,8 @@ export function physicalClues(record){
 export function publicMission(record){
  if(!record)return null;
  const m=structuredClone(record.mission);
+ delete m.station04Result;
+ const finalFeedback=station04Result(record);if(finalFeedback)m.station04Result=finalFeedback;
  m.timer=missionTimerSnapshot(record);
  if(record.mode==='independent-v1'){m.independent=true;m.timer.activeMs=record.timer.activeMs;if(record.phase==='COMPLETED')m.finalScore={total:record.scoring?.total||0,maximum:5000,stations:Object.fromEntries(Object.entries(record.scoring?.stations||{}).map(([id,score])=>[id,{earned:score.earned,maximum:score.maximum}]))};}
  delete m.vaultAssignment;

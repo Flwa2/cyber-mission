@@ -1,14 +1,16 @@
 import { missionService } from "../services/missionService.js";
 
-export function createMission(req, res) {
+export async function createMission(req, res, next) {
+  try {
   const { missionId } = req.body;
 
   if (!missionId) {
     return res.status(400).json({ error: "missionId is required" });
   }
 
-  const mission = missionService.createMission({ missionId });
+  const mission = await missionService.createMission({ missionId });
   return res.status(201).json({ mission });
+  } catch (error) { next(error); }
 }
 
 export function getMission(req, res) {
@@ -21,12 +23,14 @@ export function getMission(req, res) {
   return res.json({ mission });
 }
 
-export function updateMission(req, res) {
-  const mission = missionService.updateMission(req.params.missionId, req.body);
+export async function updateMission(req, res, next) {
+  try {
+  const mission = await missionService.updateMission(req.params.missionId, req.body);
 
   if (!mission) {
     return res.status(404).json({ error: "Mission not found" });
   }
 
   return res.json({ mission });
+  } catch (error) { next(error); }
 }

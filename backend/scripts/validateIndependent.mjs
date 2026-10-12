@@ -38,7 +38,7 @@ try{
  const complete=disk();assert.equal(Object.keys(complete.stations).length,0);assert.equal(complete.sequence,0);
  for(const [i,p] of players.entries()){assert.equal(complete.missions[p.id].scoring.total,i===1?4600:5000);assert.equal(p.mission.finalScore.total,i===1?4600:5000);assert.equal(Object.keys(complete.missions[p.id].scoring.stations).length,4);await request(p,'resolution',{action:'submit-response',revision:0});assert.deepEqual(disk().missions[p.id].scoring,complete.missions[p.id].scoring);}
  await request(players[0],'resolution',{action:'advance-response',revision:0});
- assert.deepEqual(disk().missions[historical.missionId],historical,'existing completed record remains unchanged');
+ assert.deepEqual(disk().missions[historical.missionId],{...historical,eventId:'event-legacy'},'existing completed record remains unchanged apart from its event tag');
  for(const p of players)assert(disk().missions[p.id].timer.activeMs>=1000,'timer did not restart at handoff');
  const entries=(await leaderboard()).entries;assert.equal(entries.length,5);assert.equal(new Set(entries.map(x=>x.missionId)).size,5);assert(entries.every(x=>x.completedStations===4&&x.score<=5000));
  await stop();await start();assert.deepEqual((await leaderboard()).entries,entries);

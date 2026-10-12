@@ -31,9 +31,30 @@ function replace(path, contents) {
 }
 let failed = false;
 const healthy = () => { if (failed) throw new Error("Storage write failed; restart after checking the store before accepting further requests"); };
+let pending = Promise.resolve();
 export const persistentStore = {
+  assertHealthy: healthy,
   read() { healthy(); return structuredClone(state); },
   transaction(fn) {
+    if (cloud) {
+      // Serialize read/modify/commit, including concurrent players. Read-only
+      // endpoints see only committed state; rejected transactions don't poison
+      // the queue, but a database failure deliberately makes this writer unhealthy.
+      const committed = pending.then(async () => {
+        healthy();
+        const next = structuredClone(state);
+        const result = fn(next);
+        if (result && typeof result.then === 'function') throw new Error('Storage transactions must be synchronous');
+        const contents = JSON.stringify(next);
+        if (contents !== JSON.stringify(state)) {
+          try { await cloud.save(contents); } catch (error) { failed = true; throw error; }
+          state = next;
+        }
+        return structuredClone(result);
+      });
+      pending = committed.catch(() => {});
+      return committed;
+    }
     healthy();
     // Never await: claims, decisions and awards commit together on one process.
     const next = structuredClone(state);
@@ -41,7 +62,6 @@ export const persistentStore = {
     if (result && typeof result.then === 'function') throw new Error('Storage transactions must be synchronous');
     const contents = JSON.stringify(next);
     if (contents !== JSON.stringify(state)) {
-      if (cloud) { state = next; cloud.save(contents); return structuredClone(result); }
       try {
         if (existsSync(file)) replace(file + '.bak', JSON.stringify(state));
         replace(file, contents);

@@ -32,6 +32,8 @@ export function scopedTransaction(store,fn){
  if(!scope)return store.transaction(fn);
  return store.transaction(state=>{
   const record=state.missions[scope.id];
+  // Recheck after queued cloud writes, not only before entering the transaction.
+  if(record&&(record.mode!=='independent-v1'||record.accessHash!==scope.tokenHash))throw Object.assign(new Error('Mission access denied'),{status:403});
   const view={...state,missions:record?{[scope.id]:record}:{},stations:record?.independentSlots||{}};
   const result=fn(view),saved=view.missions[scope.id];
   if(saved){

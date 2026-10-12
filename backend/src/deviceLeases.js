@@ -10,6 +10,16 @@ export function renewLease(device, now = Date.now()) {
   device.lastHeartbeatAt = now;
 }
 
+// Cheap read-only check so idle polling never opens a store transaction.
+export function needsSweep(state, now = Date.now()) {
+  for (const device of Object.values(state.stations || {})) {
+    if (!device.deviceId) continue;
+    if (device.state === 'RESETTING' && now >= device.resetAt) return true;
+    if (!Number.isFinite(device.lastHeartbeatAt) || now - device.lastHeartbeatAt > LEASE_TIMEOUT_MS) return true;
+  }
+  return false;
+}
+
 // Runs within the existing single-writer transaction. Never changes mission data.
 export function sweepDeviceLeases(state, now = Date.now()) {
   for (const device of Object.values(state.stations)) {

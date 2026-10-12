@@ -4,6 +4,7 @@ import CyberMissionBrand from '../components/CyberMissionBrand/CyberMissionBrand
 import FullscreenButton from '../components/FullscreenButton/FullscreenButton.jsx';
 import MissionTimer from '../components/MissionTimer/MissionTimer.jsx';
 import { stationNumber, stationRequest } from './boothApi.js';
+import { nextPollDelay } from './http.js';
 import './booth.css';
 import Station02 from '../stations/Station02/Station02.jsx';
 import Station04 from '../stations/Station04/Station04.jsx';
@@ -32,7 +33,7 @@ export default function StationDevice(){
   }).catch(e=>{if(!stopped)setError(e.message);}).finally(()=>{inFlight.current=false;});
   return()=>{stopped=true;};
  },[snapshot?.device.state,snapshot?.mission?.missionId]);
- useEffect(()=>{let stopped=false,timer;async function poll(){const version=mutation.current;try{const data=await stationRequest('poll');if(!stopped&&version===mutation.current){setSnapshot(data);setError('');}}catch(e){if(!stopped&&version===mutation.current){setError(e.message);}}if(!stopped)timer=setTimeout(poll,700);}poll();return()=>{stopped=true;clearTimeout(timer);};},[]);
+ useEffect(()=>{let stopped=false,timer,failures=0;async function poll(){const version=mutation.current;try{const data=await stationRequest('poll');failures=0;if(!stopped&&version===mutation.current){setSnapshot(data);setError('');}}catch(e){failures++;if(!stopped&&version===mutation.current){setError(e.message);}}if(!stopped)timer=setTimeout(poll,nextPollDelay(900,failures));}poll();return()=>{stopped=true;clearTimeout(timer);};},[]);
  async function complete(){setBusy(true);try{await stationRequest('complete-placeholder',{missionId:snapshot.mission.missionId});setSnapshot({...snapshot,device:{...snapshot.device,state:'RESETTING'}});}catch(e){setError(e.message);}finally{setBusy(false);}}
  async function deskAction(payload, endpoint='desk'){
   if(inFlight.current)return false;

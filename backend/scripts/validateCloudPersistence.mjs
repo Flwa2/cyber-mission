@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+﻿import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { createServer } from 'node:net';
@@ -32,7 +32,7 @@ const origin = `http://127.0.0.1:${port}`;
 let child;
 async function start() {
   child = spawn(process.execPath, ['src/server.js'], { cwd: fileURLToPath(new URL('../', import.meta.url)), windowsHide: true, stdio: 'pipe', env: { ...process.env, DATABASE_URL: url.href, DATABASE_SSL: 'disable', NODE_ENV: 'test', PORT: String(port), SERVE_FRONTEND: 'false', ADMIN_PASSWORD: '' } });
-  child.stderr.resume(); child.stdout.resume();
+  child.stderr.on('data', d => process.env.DEBUG_SERVER && process.stderr.write(d)); child.stdout.resume();
   for (let n = 0; n < 150; n++) {
     assert.equal(child.exitCode, null, 'Test backend exited');
     try { if ((await fetch(origin + '/api/health')).ok) return; } catch {}
@@ -87,13 +87,19 @@ try {
   // Fail a real database write. No successful response and no phantom in-memory record.
   await db.query("CREATE FUNCTION reject_test_write() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'injected storage failure'; END $$");
   await db.query('CREATE TRIGGER reject_test_write BEFORE UPDATE OF state ON booth_store FOR EACH ROW EXECUTE FUNCTION reject_test_write()');
-  assert.equal((await create('CM-FAIL')).status, 500);
-  assert.equal((await fetch(origin + '/api/health')).status, 503);
+  assert.equal((await create('CM-FAIL')).status, 503);
+  assert.equal((await (await fetch(origin + '/api/health')).json()).status, 'degraded', 'A transient write failure is reported as degraded, not a permanent outage');
   assert(!(await disk()).legacyMissions['CM-FAIL']);
-  await stop();
+  assert.equal((await fetch(origin + '/api/missions/CM-FAIL')).status, 404, 'Failed write left a phantom record in memory');
+  // Self-heal: once the database accepts writes again no restart is needed.
   await db.query('DROP TRIGGER reject_test_write ON booth_store');
   await db.query('DROP FUNCTION reject_test_write()');
+  assert.equal((await create('CM-RECOVER')).status, 201);
+  assert.equal((await (await fetch(origin + '/api/health')).json()).status, 'ok');
+  assert((await disk()).legacyMissions['CM-RECOVER']);
+  await stop();
   await start(); assert.equal((await fetch(origin + '/api/missions/CM-FAIL')).status, 404);
+  assert.equal((await fetch(origin + '/api/missions/CM-RECOVER')).status, 200);
   await stop();
 
   // Replacement server fences the old writer; it cannot overwrite the newer snapshot.
@@ -103,7 +109,7 @@ try {
     await newWriter.save(JSON.stringify(newWriter.state));
     historyIntact(await disk());
   } finally { await oldWriter.close(); await newWriter.close(); }
-  console.log(`PostgreSQL PASS: full ${Object.keys(original.missions).length}-mission backup restore; all 13 historical baseline records unchanged; commit-before-response; committed-only reads; 20 concurrent writes; duplicate requests; hard-kill recovery; persisted leaderboard; write-failure rejection; unhealthy health check; old-writer fencing.`);
+  console.log(`PostgreSQL PASS: full ${Object.keys(original.missions).length}-mission backup restore; all 13 historical baseline records unchanged; commit-before-response; committed-only reads; 20 concurrent writes; duplicate requests; hard-kill recovery; persisted leaderboard; write-failure rejection (503); degraded health and self-healing without restart; old-writer fencing.`);
 } finally {
   if (lock) { await lock.query('ROLLBACK'); lock.release(); }
   await stop(); await db.end();

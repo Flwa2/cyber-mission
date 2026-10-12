@@ -3,6 +3,7 @@ import {useMission} from '../context/MissionContext.jsx';
 import {missionService} from '../services/missionService.js';
 import {LanguageProvider} from '../locales/LanguageProvider.jsx';
 import {independentRequest} from './independentApi.js';
+import {nextPollDelay} from './http.js';
 import Station01 from '../stations/Station01/Station01.jsx';
 import Station02 from '../stations/Station02/Station02.jsx';
 import Station03 from '../stations/Station03/Station03.jsx';
@@ -15,7 +16,7 @@ export default function IndependentSession({setup}){
  const [busy,setBusy]=useState(false),[error,setError]=useState('');
  useEffect(()=>{
   if(!isLoaded)return;
-  let stopped=false,timer;
+  let stopped=false,timer,failures=0;
   async function poll(){
    const current=missionService.getActiveMission(),version=epoch.current;
    if(current?.startedAt&&!gate.current){
@@ -29,9 +30,10 @@ export default function IndependentSession({setup}){
       if(result.mission&&(JSON.stringify(pending)===JSON.stringify(current)||result.mission.currentStation!==current.currentStation))latest.current.saveMission(result.mission);
       setError('');
      }
-    }catch(e){if(!stopped&&version===epoch.current){if(e.conflict?.mission){latest.current.saveMission(e.conflict.mission);localStorage.setItem(`cyberMission.independentRevision.${current.missionId}`,e.conflict.revision);}else setError(e.message);}}
+     failures=0;
+    }catch(e){failures++;if(!stopped&&version===epoch.current){if(e.conflict?.mission){latest.current.saveMission(e.conflict.mission);localStorage.setItem(`cyberMission.independentRevision.${current.missionId}`,e.conflict.revision);}else setError(e.message);}}
    }
-   if(!stopped)timer=setTimeout(poll,800);
+   if(!stopped)timer=setTimeout(poll,nextPollDelay(1000,failures));
   }
   poll();return()=>{stopped=true;clearTimeout(timer);};
  },[isLoaded]);

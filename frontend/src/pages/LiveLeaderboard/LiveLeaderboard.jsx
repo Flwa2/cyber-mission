@@ -2,6 +2,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {LanguageProvider,useTranslation} from '../../locales/LanguageProvider.jsx';
 import CyberMissionBrand from '../../components/CyberMissionBrand/CyberMissionBrand.jsx';
 import FullscreenButton from '../../components/FullscreenButton/FullscreenButton.jsx';
+import {nextPollDelay} from '../../booth/http.js';
 import RankedList from './RankedList.jsx';
 import {reconcileEntries} from './ranking.mjs';
 import './LiveLeaderboard.css';
@@ -14,9 +15,9 @@ function Board({setLanguage}){
  const requestVersion=useRef(0),historyVersion=useRef(0);
  const hasPlayers=entries.length>0;
  const leaveHistory=()=>{historyVersion.current++;setView('live');setSelected(null);};
- useEffect(()=>{let stopped=false,timer,controller,currentId;
+ useEffect(()=>{let stopped=false,timer,controller,currentId,failures=0;
  if(import.meta.env.DEV){const preview=new URLSearchParams(location.search).get('leaderboardPreview');if(preview==='empty'||preview==='populated'){import('../../dev/leaderboardPreview.mjs').then(({previewEntries})=>{if(!stopped){setEntries(old=>reconcileEntries(old,previewEntries(preview)));}});return()=>{stopped=true;};}}
-const poll=async()=>{const version=requestVersion.current;controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),5000);try{const response=await fetch('/api/booth/leaderboard',{signal:controller.signal,cache:'no-store'});if(!response.ok)throw Error('Disconnected');const data=await response.json();if(!Array.isArray(data.entries))throw Error('Invalid snapshot');if(!stopped&&version===requestVersion.current){const id=data.event?.id??null;if(id!==currentId){currentId=id;setEntries(data.entries);}else setEntries(old=>reconcileEntries(old,data.entries));setEvent(data.event||null);}}catch{/* Keep the last confirmed snapshot while reconnecting. */}finally{clearTimeout(timeout);if(!stopped)timer=setTimeout(poll,1500);}};poll();return()=>{stopped=true;clearTimeout(timer);controller?.abort();};},[]);
+const poll=async()=>{const version=requestVersion.current;controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),5000);try{const response=await fetch('/api/booth/leaderboard',{signal:controller.signal,cache:'no-store'});if(!response.ok)throw Error('Disconnected');const data=await response.json();if(!Array.isArray(data.entries))throw Error('Invalid snapshot');if(!stopped&&version===requestVersion.current){const id=data.event?.id??null;if(id!==currentId){currentId=id;setEntries(data.entries);}else setEntries(old=>reconcileEntries(old,data.entries));setEvent(data.event||null);}failures=0;}catch{failures++;/* Keep the last confirmed snapshot while reconnecting. */}finally{clearTimeout(timeout);if(!stopped)timer=setTimeout(poll,nextPollDelay(2000,failures));}};poll();return()=>{stopped=true;clearTimeout(timer);controller?.abort();};},[]);
  const openPast=async()=>{const version=++historyVersion.current;setView('previous');setSelected(null);try{const r=await fetch('/api/booth/events',{cache:'no-store'});if(r.ok){const data=await r.json();if(version===historyVersion.current)setPast(data.previous);}}catch{/* keep list */}};
  const openEvent=async id=>{const version=++historyVersion.current;setSelected(null);try{const r=await fetch(`/api/booth/events/${id}/leaderboard`,{cache:'no-store'});if(r.ok){const data=await r.json();if(version===historyVersion.current&&data.event?.id===id)setSelected(data);}}catch{/* ignore */}};
  const openDialog=async()=>{let needPin=true;try{const r=await fetch('/api/admin/session',{cache:'no-store',credentials:'same-origin'});if(r.ok)needPin=!(await r.json()).authenticated;}catch{/* ask for PIN */}setDialog({name:'',pin:'',needPin,error:'',busy:false});};

@@ -1,4 +1,4 @@
-import {AsyncLocalStorage} from 'node:async_hooks';
+﻿import {AsyncLocalStorage} from 'node:async_hooks';
 import {createHash} from 'node:crypto';
 import {resumeMissionTimer} from './missionTimer.js';
 import {publicMission} from './caseEngine.js';
@@ -10,7 +10,7 @@ export const independentMiddleware=(store,project)=>(req,res,next)=>{
  if(!/^CM-[A-Z0-9]{6}$/.test(id)||typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token))return reject(res,401,'Invalid mission credential');
  if(!['sync','poll','activate','desk','investigation','resolution'].includes(action)||! /^[1-4]$/.test(station))return reject(res,400,'Invalid mission operation');
  const tokenHash=createHash('sha256').update(token).digest('hex');
- const record=store.read().missions[id];
+ const record=(store.peek?store.peek():store.read()).missions[id];
  if(record&&(record.mode!=='independent-v1'||record.accessHash!==tokenHash))return reject(res,403,'Mission access denied');
  if(!record&&(action!=='sync'||station!=='1'))return reject(res,404,'Mission not found');
  if(req.body.missionId&&req.body.missionId!==id)return reject(res,400,'Mission does not match');
@@ -30,7 +30,7 @@ export const independentMiddleware=(store,project)=>(req,res,next)=>{
 export function scopedTransaction(store,fn){
  const scope=independentContext.getStore();
  if(!scope)return store.transaction(fn);
- return store.transaction(state=>{
+ return store.scoped(scope.id,state=>{
   const record=state.missions[scope.id];
   // Recheck after queued cloud writes, not only before entering the transaction.
   if(record&&(record.mode!=='independent-v1'||record.accessHash!==scope.tokenHash))throw Object.assign(new Error('Mission access denied'),{status:403});

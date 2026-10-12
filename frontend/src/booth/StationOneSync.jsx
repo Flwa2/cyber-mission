@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMission } from '../context/MissionContext.jsx';
 import { missionService } from '../services/missionService.js';
 import { stationRequest } from './boothApi.js';
+import { nextPollDelay } from './http.js';
 import './booth.css';
 import useDeviceHeartbeat from './useDeviceHeartbeat.js';
 import { translate } from '../locales/translate.js';
@@ -15,7 +16,7 @@ export default function StationOneSync(){
  const activating=useRef(null);
  useEffect(()=>{
   if(!isLoaded)return;
-  let stopped=false,timer;
+  let stopped=false,timer,failures=0;
   const key=id=>`cyberMission.syncedRevision.${id}`;
   const remember=(id,value)=>localStorage.setItem(key(id),String(value));
   const adopt=(saved,revision)=>{
@@ -55,7 +56,9 @@ export default function StationOneSync(){
      }
     }
     if(!stopped)setError('');
+    failures=0;
    }catch(e){
+    failures++;
     if(stopped)return;
     if(e.status===409&&e.conflict?.mission){
      // Stale writes are rejected by the server, never replayed with a new
@@ -67,7 +70,7 @@ export default function StationOneSync(){
   async function tick(){
    if(navigator.locks)await navigator.locks.request('cyberMission.station01.sync',synchronize);
    else await synchronize();
-   if(!stopped)timer=setTimeout(tick,800);
+   if(!stopped)timer=setTimeout(tick,nextPollDelay(1000,failures));
   }
   tick();return()=>{stopped=true;clearTimeout(timer);};
  },[isLoaded]);

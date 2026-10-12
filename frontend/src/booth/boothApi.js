@@ -1,3 +1,4 @@
+import {requestJson} from './http.js';
 import {INDEPENDENT_MODE} from './playMode.js';
 import {independentRequest} from './independentApi.js';
 export const stationNumber = Math.min(4, Math.max(1, Number(new URLSearchParams(location.search).get('deviceStation')) || 1));
@@ -22,7 +23,6 @@ export async function getDeviceId() {
  return deviceId = localStorage.getItem(key);
 }
 export async function boothRequest(path, body) {
- const response = await fetch(`/api/booth${path}`, {method:body ? 'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(5000)});
- const data=await response.json();if(!response.ok){const error=new Error(data.error||'Booth connection unavailable');error.status=response.status;error.conflict=data.conflict;throw error;}return data;
+ return requestJson("/api/booth"+path, {method:body ? 'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined}, body ? {timeoutMs:8000,retries:path.endsWith('/heartbeat')||path.endsWith('/poll')?0:2,deadlineMs:26000} : {timeoutMs:6000,retries:1});
 }
 export const stationRequest=async(action,body={})=>INDEPENDENT_MODE?independentRequest(action,body):boothRequest(`/stations/${stationNumber}/${action}`,{deviceId:await getDeviceId(),...body});

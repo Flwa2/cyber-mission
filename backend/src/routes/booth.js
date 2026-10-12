@@ -1,4 +1,4 @@
-import { independentContext, independentMiddleware, scopedTransaction } from '../independentMode.js';
+﻿import { independentContext, independentMiddleware, scopedTransaction } from '../independentMode.js';
 import {leaderboardSnapshot} from '../leaderboard.js';
 import {publicEvents,publicEventLeaderboard} from '../events.js';
 import { finalizeStationScore } from '../progressiveScoring.js';
@@ -8,7 +8,7 @@ import { recordIncidentResponse } from '../station04Response.js';
 import { ensureNarrativeAssignment } from '../narrativeAssignment.js';
 import { Router } from 'express';
 import { persistentStore } from '../persistentStore.js';
-import { releaseDevice, renewLease, sweepDeviceLeases } from '../deviceLeases.js';
+import { needsSweep, releaseDevice, renewLease, sweepDeviceLeases } from '../deviceLeases.js';
 import { normalizeLanguage } from '../../../shared/language.mjs';
 import { PLAYER_AVATAR_IDS } from '../../../shared/playerAvatars.mjs';
 import { recordDeskDecision } from '../station02Decisions.js';
@@ -40,14 +40,18 @@ function revisionCheck(r,d,revision) {
 function owned(d,id) { if(d.deviceId && d.deviceId!==id)fail('Station is assigned to another device'); }
 const handle=fn=>async(req,res,next)=>{try{res.json(await fn(req));}catch(e){next(e);}};
 // Read-only display bypasses lease maintenance and never claims a station.
-router.get('/leaderboard',(req,res)=>{const s=persistentStore.read();res.set('Cache-Control','no-store').json({...leaderboardSnapshot(s),event:publicEvents(s).active});});
-router.get('/events',(req,res)=>res.set('Cache-Control','no-store').json(publicEvents(persistentStore.read())));
-router.get('/events/:id/leaderboard',(req,res,next)=>{try{res.set('Cache-Control','no-store').json(publicEventLeaderboard(persistentStore.read(),req.params.id));}catch(e){e.status?res.status(e.status).json({error:e.message}):next(e);}});
+// Public reads are derived from committed state only and cached per store version.
+const publicCache=new Map(),boot=Date.now().toString(36);
+const cached=(key,build)=>{const v=persistentStore.version,hit=publicCache.get(key);if(hit?.v===v)return hit.body;const body=JSON.stringify(build(persistentStore.peek()));if(publicCache.size>50)publicCache.clear();publicCache.set(key,{v,body});return body;};
+const sendJson=(req,res,body,v=persistentStore.version)=>{const etag='W/"'+boot+'-'+v+'-'+body.length+'"';res.set({'Cache-Control':'no-cache','ETag':etag,'Content-Type':'application/json; charset=utf-8'});if(req.headers['if-none-match']===etag)return res.status(304).end();res.send(body);};
+router.get('/leaderboard',(req,res)=>sendJson(req,res,cached('lb',s=>({...leaderboardSnapshot(s),event:publicEvents(s).active}))));
+router.get('/events',(req,res)=>sendJson(req,res,cached('events',s=>publicEvents(s))));
+router.get('/events/:id/leaderboard',(req,res,next)=>{try{sendJson(req,res,cached('ev:'+req.params.id,s=>publicEventLeaderboard(s,req.params.id)));}catch(e){e.status?res.status(e.status).json({error:e.message}):next(e);}});
 router.post('/independent/:id/:station/:action',independentMiddleware(persistentStore,publicMission));
 // Cleanup commits even when the following request is rejected. Also runs when
 // every browser is offline; no unload event or competing poll is required.
-router.use(async(req,res,next)=>{try{if(!independentContext.getStore())await transaction(s=>sweepDeviceLeases(s));next();}catch(e){next(e);}});
-setInterval(async()=>{try{await transaction(s=>sweepDeviceLeases(s));}catch(e){console.error('Device lease cleanup failed:',e.message);}},1000).unref();
+router.use(async(req,res,next)=>{try{if(!independentContext.getStore()&&needsSweep(persistentStore.peek()))await transaction(s=>sweepDeviceLeases(s));next();}catch(e){next(e);}});
+setInterval(async()=>{try{if(needsSweep(persistentStore.peek()))await transaction(s=>sweepDeviceLeases(s));}catch(e){console.error('Device lease cleanup failed:',e.message);}},1000).unref();
 router.post('/stations/:station/heartbeat',handle(req=>transaction(s=>{
  const {station,deviceId}=input(req),d=slot(s,station);
  owned(d,deviceId);

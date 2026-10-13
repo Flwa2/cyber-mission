@@ -49,7 +49,7 @@ for(const definition of CASES){
   assert.equal(Boolean(publicVault(hints).revealedCode),level===3);
  }
  assert.equal(publicVault(hints).revealedCode,hints.vaultAssignment.code);assert(hints.vaultState.unlockedAt);
- const serialized=publicMission(hints);assert(!serialized.vaultAssignment);assert(!serialized.vaultState);assert(!serialized.vault.references.email.metadata);assert(!JSON.stringify(serialized.vault).includes('isIncidentRelevant'));
+ const serialized=publicMission(hints);assert(!serialized.vaultAssignment);assert(!serialized.vaultState);assert.equal(serialized.vault.references.email,null);assert(!JSON.stringify(serialized.vault).includes('isIncidentRelevant'));
  const legacy=fixture(definition);delete legacy.vaultAssignment;recordIncidentResponse(legacy,{action:'begin-response'});assert(!publicVault(legacy));
  const inProgress=fixture(definition);inProgress.mission.decisions.station04={version:2,phase:'person'};assert(!publicVault(inProgress),'already-started responses stay legacy');
 }

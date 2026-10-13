@@ -38,7 +38,10 @@ for(const definition of CASES)for(let n=0;n<12;n++){
  const mailRow=rows.find(x=>x.id===(definition.id==='case-03'?'finance:review-mail':`case:${definition.personId}:mail`));
  const docRow=rows.find(x=>x.id===(definition.id==='case-03'?'case:export':'case:reem:document'));
  for(const l of ['en','ar'])assert(docRow.description[l].includes(v.reference),`${definition.id} document shows the reference`);
- assert(mailRow.description.en.includes(rule.en)&&mailRow.description.ar.includes(rule.ar),'email states the rule');
+ assert(!mailRow.description.en.includes(rule.en)&&!mailRow.description.ar.includes(rule.ar),'Station 03 mail is left unchanged');
+ assert.equal(r.vaultAssignment.clueSources.email,null,'no meeting email in the vault archive');
+ const primary=r.vaultAssignment.clueSources.documents[0];
+ for(const l of ['en','ar'])assert(primary.description[l].includes(rule[l])&&primary.description[l].includes(v.reference),'archive document carries the rule and reference');
  // Station 03 rows never expose the answer or the rule id.
  const blob=JSON.stringify(rows);
  assert(!blob.includes(v.ruleId));

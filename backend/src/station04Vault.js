@@ -23,16 +23,12 @@ export function bindVaultClues(record){
  if(!mail||!document||document.title!==(finance?'Payments_Oct.xlsx':'Invoice_1048.pdf'))throw new Error('Vault clue source is unavailable');
  const rule=vault.contentVersion===2?vaultRule(vault.ruleId):null;
  const note=rule?{
-  en:`The archived copy opens with the review reference on the ${finance?'payment worksheet':'revised invoice'}. ${rule.en} I left the working copy in the team folder.`,
-  ar:`تُفتح النسخة المؤرشفة بمرجع المراجعة المدوّن على ${finance?'كشف المدفوعات':'الفاتورة المعدلة'}. ${rule.ar} تركت نسخة العمل في مجلد الفريق.`
+  en:`${rule.en}`,
+  ar:`${rule.ar}`
  }:{
-  en:`The archived copy opens with the review reference on the ${finance?'payment worksheet':'revised invoice'}, leaving out the first two digits. I left the working copy in the team folder.`,
-  ar:`تُفتح النسخة المؤرشفة بمرجع المراجعة المدوّن على ${finance?'كشف المدفوعات':'الفاتورة المعدلة'}، بعد حذف أول رقمين. تركت نسخة العمل في مجلد الفريق.`
- };
- for(const [lang,closing,label] of [['en','Thank you,','Review reference'],['ar','شكرًا،','مرجع المراجعة']]){
-  const marker=`\n\n${closing}`;
-  if(!mail.description[lang]?.includes(marker))throw new Error('Vault correspondence closing is unavailable');
-  mail.description[lang]=mail.description[lang].replace(marker,`\n\n${note[lang]}${marker}`);
+  en:'Use the review reference with the first two digits left out.',
+  ar:'استخدم مرجع المراجعة بعد حذف أول رقمين منه.'
+ }; for(const [lang,label] of [['en','Review reference'],['ar','مرجع المراجعة']]){
   document.description[lang]+=`\n${label}: ${vault.reviewReference}`;
  }
  // Exact source copies for the future archive-reference viewer. These are not
@@ -82,7 +78,10 @@ export function bindVaultClues(record){
  }))];
  // Keep the private source snapshots for migration/tests. Only `documents`
  // is exposed to the Station 04 viewer.
- vault.clueSources={email:structuredClone(mail),document:structuredClone(document),documents:archiveDocuments};
+ // The vault rule lives in the archive copy only; the Station 03 evidence rows stay unchanged.
+ const archiveNote={en:'Archive access note',ar:'ملاحظة الأرشفة'};
+ for(const lang of ['en','ar'])archiveDocuments[0].description[lang]+=`\n${archiveNote[lang]}: ${note[lang]}`;
+ vault.clueSources={email:null,document:structuredClone(document),documents:archiveDocuments};
 }
 
 export {vaultEnabled,isVaultReplay,recordVaultAction,publicVault} from './station04VaultFlow.js';

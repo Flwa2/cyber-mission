@@ -35,10 +35,7 @@ export function createPreviewRecord(language='ar',phase='intro',now=new Date().t
  if(['vault','discovery'].includes(target)){
   const caseId=String(seed).match(/case-0[1-4]/)?.[0]||'case-04',finance=caseId==='case-03';
   record.caseAssignment={definition:{id:caseId,steps:[{minute:-11}]}};
-  const email=structuredClone(clue);
-  email.description.en+='\n\nThe archived copy opens with the review reference on the '+(finance?'payment worksheet':'revised invoice')+', leaving out the first two digits. I left the working copy in the team folder.';
-  email.description.ar+='\n\nتُفتح النسخة المؤرشفة بمرجع المراجعة المدوّن على '+(finance?'كشف المدفوعات':'الفاتورة المعدلة')+'، بعد حذف أول رقمين. تركت نسخة العمل في مجلد الفريق.';
-  const document={id:'preview:invoice',title:finance?'Payments_Oct.xlsx':'Invoice_1048.pdf',timestamp:now,description:{en:'Horizon Environmental Services\nInvoice 1048 — revised copy\nField survey services: SAR 60,000\nAnalysis and reporting: SAR 24,000\nTotal: SAR 84,000\nPayment status: awaiting review\nReview reference: 590007',ar:'آفاق للخدمات البيئية\nالفاتورة 1048 — نسخة معدلة\nخدمات المسح الميداني: 60,000 ريال\nالتحليل وإعداد التقرير: 24,000 ريال\nالإجمالي: 84,000 ريال\nحالة الصرف: بانتظار المراجعة\nمرجع المراجعة: 590007'}};
+  const document={id:'preview:invoice',title:finance?'Payments_Oct.xlsx':'Invoice_1048.pdf',timestamp:now,description:{en:'Horizon Environmental Services\nInvoice 1048 — revised copy\nField survey services: SAR 60,000\nAnalysis and reporting: SAR 24,000\nTotal: SAR 84,000\nPayment status: awaiting review\nReview reference: 590007\nArchive access note: Leave out the first two digits of the review reference.',ar:'آفاق للخدمات البيئية\nالفاتورة 1048 — نسخة معدلة\nخدمات المسح الميداني: 60,000 ريال\nالتحليل وإعداد التقرير: 24,000 ريال\nالإجمالي: 84,000 ريال\nحالة الصرف: بانتظار المراجعة\nمرجع المراجعة: 590007\nملاحظة الأرشفة: احذف أول رقمين من مرجع المراجعة.'}};
   const distractorSets={
    'case-01':[
     ['Access_Request_317.pdf','OPERATIONS ACCESS REQUEST\nRequest No.: OP-317\nReference: 317842\nDate: 2026-10-10\nDepartment: Field Operations\nVisitor count: 3\nStatus: Approved by Facilities','طلب دخول العمليات\nرقم الطلب: OP-317\nالمرجع: 317842\nالتاريخ: 2026-10-10\nالإدارة: العمليات الميدانية\nعدد الزوار: 3\nالحالة: معتمد من إدارة المرافق'],
@@ -54,7 +51,7 @@ export function createPreviewRecord(language='ar',phase='intro',now=new Date().t
     ['Room_Booking_9184.pdf','PROJECT REVIEW ROOM RESERVATION\nBooking No.: 9184\nReservation reference: 918472\nDate: 2026-10-10\nRoom: Atlas-4\nAttendees: 11\nStatus: Confirmed · 09:30–11:00','حجز قاعة مراجعة المشروع\nرقم الحجز: 9184\nمرجع الحجز: 918472\nالتاريخ: 2026-10-10\nالقاعة: أطلس-4\nعدد الحضور: 11\nالحالة: مؤكد · 09:30–11:00']]
   };
   const distractors=distractorSets[caseId].map(([title,en,ar],index)=>({id:`preview:distractor:${index+1}`,title,timestamp:now,description:{en,ar}}));
-  record.vaultAssignment={version:1,code:'0007',reviewReference:'590007',clueSources:{email,document,documents:[document,...distractors]}};
+  record.vaultAssignment={version:1,code:'0007',reviewReference:'590007',clueSources:{email:null,document,documents:[document,...distractors]}};
   if(target==='discovery')recordVaultAction(record,{action:'vault-attempt',code:'0007',requestId:'preview-unlock'},now);
   return record;
  }

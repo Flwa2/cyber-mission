@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import {useTranslation} from '../../locales/LanguageProvider.jsx';
+import BidiText from '../../components/BidiText.jsx';
 import './Vault.css';
 
 const digits=value=>value.replace(/[٠-٩]/g,c=>String(c.charCodeAt(0)-1632)).replace(/[۰-۹]/g,c=>String(c.charCodeAt(0)-1776));
@@ -90,7 +91,7 @@ export default function Vault({vault,onAction,busy,error}){
    {panel==='hint'&&<div className="vault-popover vault-hints">
     {!confirmLevel&&<><p>{copy(`Vault score: ${vault.awardAvailable??600}/600. Hints reduce this score.`,`نقاط الخزنة: ${vault.awardAvailable??600}/600. التلميحات تخصم من النقاط.`)}</p>
      {vault.hintLevel>=1&&<p>{copy('The required file is: ','الملف المطلوب هو: ')}<bdi>{display(documents[0]?.title)}</bdi></p>}
-     {vault.hintLevel>=2&&<p>{vault.hintRule?display(vault.hintRule):copy('Use the review reference found inside the document.','استخدم مرجع المراجعة الموجود داخل الملف.')}</p>}
+     {vault.hintLevel>=2&&<p>{vault.hintRule?<BidiText text={display(vault.hintRule)} language={language}/>:copy('Use the review reference found inside the document.','استخدم مرجع المراجعة الموجود داخل الملف.')}</p>}
      {vault.hintLevel<3&&<button disabled={blocked} onClick={()=>setConfirmLevel(vault.hintLevel+1)}>{vault.hintLevel===0?copy('Use Hint 1 · 100 points','استخدام التلميح 1 · خصم 100 نقطة'):vault.hintLevel===1?copy('Use Hint 2 · 200 points','استخدام التلميح 2 · خصم 200 نقطة'):copy('Reveal code · 250 points','إظهار الرمز · خصم 250 نقطة')}</button>}
     </>}
     {confirmLevel&&<div className="vault-inline-confirm">
@@ -103,13 +104,13 @@ export default function Vault({vault,onAction,busy,error}){
   {vault.unlockedAt&&<div className="vault-discovery-overlay"><div className="vault-discovery" role="dialog" aria-modal="true" aria-label={copy('Recovered archive document','مستند الأرشيف المستعاد')} aria-live="polite">
     {opening?<p>{copy('Opening the archive…','جارٍ فتح الأرشيف…')}</p>:<>
      {vault.revealedCode&&<p>{copy('Revealed combination','الرمز الذي تم إظهاره')}: <bdi>{vault.revealedCode}</bdi></p>}
-     <article className="vault-paper"><p>{copy('RECOVERED · DELETED CONVERSATION','مستعادة · محادثة محذوفة')}</p><h2>{display(vault.discovery?.title)}</h2><time>{vault.discovery?.timestamp&&new Intl.DateTimeFormat(language,{dateStyle:'medium',timeStyle:'short'}).format(new Date(vault.discovery.timestamp))}</time>{vault.discovery?.conversation?.[language]?.map((message,index)=><p className="vault-message" key={index} dir="auto">{message}</p>)||<div>{display(vault.discovery?.description)}</div>}</article>
+     <article className="vault-paper"><p>{copy('RECOVERED · DELETED CONVERSATION','مستعادة · محادثة محذوفة')}</p><h2>{display(vault.discovery?.title)}</h2><time>{vault.discovery?.timestamp&&new Intl.DateTimeFormat(language,{dateStyle:'medium',timeStyle:'short'}).format(new Date(vault.discovery.timestamp))}</time>{vault.discovery?.conversation?.[language]?.map((message,index)=><p className="vault-message" key={index} dir="auto"><BidiText text={message} language={language}/></p>)||<div>{display(vault.discovery?.description)}</div>}</article>
      <button className="vault-primary" disabled={blocked} onClick={()=>act({action:'vault-continue'})}>{copy('REVIEW THE INVESTIGATION BOARD →','راجع لوحة التحقيق ←')}</button>
     </>}
   </div></div>}
   <dialog className="vault-reference-dialog" dir={ar?'rtl':'ltr'} ref={dialog} aria-labelledby="vault-reference-title" onCancel={event=>{event.preventDefault();setSource(null);}} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setSource(null);}}} onClick={event=>{if(event.target===event.currentTarget)setSource(null);}}>
    <button className="vault-close" aria-label={copy('Close document','إغلاق المستند')} onClick={()=>setSource(null)}>×</button>
-   {selected&&<article><p>{copy('ORIGINAL CORRESPONDENCE','المراسلات الأصلية')}</p><h2 id="vault-reference-title" dir="auto">{display(selected.title)}</h2>{selected.from&&<p>{display(selected.senderName)} · <bdi>{selected.from}</bdi></p>}<time>{new Intl.DateTimeFormat(language,{dateStyle:'medium',timeStyle:'short'}).format(new Date(selected.timestamp))}</time><div className="vault-reference-body" dir="auto">{display(selected.description)}</div></article>}
+   {selected&&<article><p>{copy('ORIGINAL CORRESPONDENCE','المراسلات الأصلية')}</p><h2 id="vault-reference-title" dir="auto">{display(selected.title)}</h2>{selected.from&&<p>{display(selected.senderName)} · <bdi>{selected.from}</bdi></p>}<time>{new Intl.DateTimeFormat(language,{dateStyle:'medium',timeStyle:'short'}).format(new Date(selected.timestamp))}</time><div className="vault-reference-body" dir="auto"><BidiText text={display(selected.description)} language={language}/></div></article>}
   </dialog>
  </section>;
 }

@@ -40,10 +40,11 @@ for(const definition of CASES)for(const digits of [0,7,1048,9999]){
  assert.deepEqual(facts(record.station03Experience.rows),facts(baseline.station03Experience.rows),'only descriptions change');
  const {email,document}=record.vaultAssignment.clueSources;
  assert.equal(document.title,definition.id==='case-03'?'Payments_Oct.xlsx':'Invoice_1048.pdf');
- assert.equal(record.station03Experience.rows.filter((r,i)=>JSON.stringify(r)!==JSON.stringify(baseline.station03Experience.rows[i])).length,2);
+ assert.equal(record.station03Experience.rows.filter((r,i)=>JSON.stringify(r)!==JSON.stringify(baseline.station03Experience.rows[i])).length,1);
  for(const lang of ['ar','en']){
   assert(document.description[lang].includes(original.reviewReference));
-  assert(email.description[lang].includes(vaultRule(original.ruleId)[lang]));
+  assert.equal(email,null);
+  assert(record.vaultAssignment.clueSources.documents[0].description[lang].includes(vaultRule(original.ruleId)[lang]));
   assert(document.description[lang].startsWith(baseline.station03Experience.rows.find(r=>r.id===document.id).description[lang]));
   const publicState=publicMission(record);
   assert(!JSON.stringify(publicState).includes('vaultAssignment'));

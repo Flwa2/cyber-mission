@@ -32,7 +32,7 @@ for(const definition of CASES){
  assert.equal(r.vaultState.awardAvailable,600);assert.equal(r.vaultState.attemptCount,1);
  assert.throws(()=>recordVaultAction(r,{action:'vault-continue',requestId:'skip-request'}),/first/);
  const later=new Date(Date.parse(now)+3000).toISOString();
- recordVaultAction(r,{action:'vault-attempt',code:'٠٠٠٧',requestId:'right-request'},later);
+ recordVaultAction(r,{action:'vault-attempt',code:privateCode.replace(/\d/g,d=>String.fromCharCode(1632+Number(d))),requestId:'right-request'},later);
  assert(publicVault(r).discovery);assert(!publicVault(r).revealedCode);assert.equal(r.vaultState.awardAvailable,600);
  const discovery=r.vaultState.discovery;
  assert(Date.parse(discovery.timestamp)<Date.parse(now),'archive follows historical case events');
@@ -79,7 +79,7 @@ try{
  assert.equal(state.mission.vault.awardAvailable,500);assert.equal(state.mission.startedAt,now);
  await action({action:'vault-hint',level:2,requestId:'stale-revision',revision:0},409);
  for(const level of [2,3])state=await action({action:'vault-hint',level,requestId:`http-hint-${level}`,revision:state.revision});
- assert.equal(state.mission.vault.revealedCode,'0007');assert(state.mission.vault.discovery);
+ assert.equal(state.mission.vault.revealedCode,record.vaultAssignment.code);assert(state.mission.vault.discovery);
  state=await action({action:'vault-continue',requestId:'http-continue',revision:state.revision});
  assert.equal(state.mission.decisions.station04.phase,'person');assert.equal(disk().vaultState.awardAvailable,50);assert(!disk().scoring,'no new score finalization in Step 2');
  assert.deepEqual(disk().mission.evidence,record.mission.evidence);

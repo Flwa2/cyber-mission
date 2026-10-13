@@ -26,7 +26,7 @@ assert.equal(applyVaultRule(VAULT_RULES[0].id,'004912'),'0049');
 
 function fixture(definition,seed,scoreModel='bonus-v1'){
  const r={missionId:'CM-V2-'+seed,scoreModel,stage:3,phase:'ACTIVE',timerPaused:true,revision:0,caseAssignment:{version:1,definition,...(definition.id==='case-03'?{station03:financeTemplate(definition)}:{})},mission:{missionId:'CM-V2-'+seed,playerName:'V2',startedAt:now,status:'active',currentStation:4,completedStations:[1,2,3],language:'en',narrativeAssignment:createNarrativeAssignment(seededNarrativeRandom(seed+definition.id),now),decisions:{station01:{scenarioId:'SMS-PHISH-001'},station02:{items:{}}},evidence:[]}};
- initializeVaultAssignment(r,{newMission:true});ensureStation03Experience(r,caseCatalog(r));r.stage=4;
+ r.vaultAssignment={version:1,contentVersion:2,...createVaultCodeAssignment(n=>Math.floor(Math.random()*n)),clueSources:null};r.vaultAssignment.reviewReference=r.vaultAssignment.reference;ensureStation03Experience(r,caseCatalog(r));r.stage=4;
  return r;
 }
 const seen=new Set();

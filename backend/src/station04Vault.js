@@ -1,12 +1,17 @@
 import {randomInt} from 'node:crypto';
-import {createVaultCodeAssignment,decoyReference,vaultRule} from './station04VaultRules.js';
+import {createVaultCodeAssignmentV3,decoyReference,vaultRule} from './station04VaultRules.js';
+import {bindVaultMail} from './station04VaultMail.js';
 
 // Private record sibling, never part of mission/publicStation03Experience.
 // Only the new-record creation boundary may opt a mission into this version.
 export function initializeVaultAssignment(record,{newMission=false,random=randomInt}={}){
  if(!newMission||record.vaultAssignment)return;
- const {ruleId,reference,code}=createVaultCodeAssignment(random);
- record.vaultAssignment={version:1,contentVersion:2,assignedAt:new Date().toISOString(),ruleId,reference,code,
+ const {ruleId,reference,code}=createVaultCodeAssignmentV3(random);
+ const choices=record.mission.narrativeAssignment?.choices;
+ if(!choices?.length)throw new Error('Vault requires the saved case identities');
+ const pick=n=>((random(n)%n)+n)%n;
+ const sender=structuredClone(choices[pick(choices.length)]),templateIndex=pick(3);
+ record.vaultAssignment={version:1,contentVersion:3,assignedAt:new Date().toISOString(),ruleId,reference,code,sender,templateIndex,
   reviewReference:reference,clueSources:null};
 }
 
@@ -21,7 +26,7 @@ export function bindVaultClues(record){
  const mail=rows.find(r=>r.id===(finance?'finance:review-mail':`case:${definition.personId}:mail`));
  const document=rows.find(r=>r.id===(finance?'case:export':'case:reem:document'));
  if(!mail||!document||document.title!==(finance?'Payments_Oct.xlsx':'Invoice_1048.pdf'))throw new Error('Vault clue source is unavailable');
- const rule=vault.contentVersion===2?vaultRule(vault.ruleId):null;
+ const rule=vault.contentVersion>=2?vaultRule(vault.ruleId):null;
  const note=rule?{
   en:`${rule.en}`,
   ar:`${rule.ar}`
@@ -31,7 +36,7 @@ export function bindVaultClues(record){
  }; for(const [lang,label] of [['en','Review reference'],['ar','مرجع المراجعة']]){
   document.description[lang]+=`\n${label}: ${vault.reviewReference}`;
  }
- // Exact source copies for the future archive-reference viewer. These are not
+ // Source copies for the archive-reference viewer. These are not
  // collected evidence and do not change Station 03 selection or its score.
  const date=new Date(document.timestamp).toISOString().slice(0,10);
  const code=Number(vault.code);
@@ -76,11 +81,11 @@ export function bindVaultClues(record){
   description,metadata:{reference},
   type:'pdf',timestamp:document.timestamp
  }))];
- // Keep the private source snapshots for migration/tests. Only `documents`
- // is exposed to the Station 04 viewer.
- // The vault rule lives in the archive copy only; the Station 03 evidence rows stay unchanged.
+ // Existing content versions keep their original document-note behavior.
+ // V3 puts the clue in Station 03 correspondence only; the archive gets the reference.
  const archiveNote={en:'Archive access note',ar:'ملاحظة الأرشفة'};
- for(const lang of ['en','ar'])archiveDocuments[0].description[lang]+=`\n${archiveNote[lang]}: ${note[lang]}`;
+ if(vault.contentVersion===3)bindVaultMail(record,mail,document);
+ else for(const lang of ['en','ar'])archiveDocuments[0].description[lang]+=`\n${archiveNote[lang]}: ${note[lang]}`;
  vault.clueSources={email:null,document:structuredClone(document),documents:archiveDocuments};
 }
 

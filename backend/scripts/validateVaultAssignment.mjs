@@ -19,7 +19,7 @@ import {station04Evidence} from '../../frontend/src/stations/Station04/evidence.
 
 const now=new Date().toISOString(),root=fileURLToPath(new URL('../',import.meta.url));
 const records={};
-const facts=rows=>rows.map(({description,...r})=>r);
+const facts=rows=>rows.map(({description,metadata,...r})=>r);
 for(const definition of CASES)for(const digits of [0,7,1048,9999]){
  const id=`${definition.id}-${digits}`;
  const record={stage:3,phase:'ACTIVE',caseAssignment:{version:1,definition:structuredClone(definition),...(definition.id==='case-03'?{station03:financeTemplate(definition)}:{})},mission:{missionId:id,startedAt:now,language:'en',completedStations:[1,2],narrativeAssignment:createNarrativeAssignment(seededNarrativeRandom(id),now),decisions:{station01:{scenarioId:'SMS-PHISH-001'},station02:{items:{}}},evidence:[]}};
@@ -32,19 +32,20 @@ for(const definition of CASES)for(const digits of [0,7,1048,9999]){
  const original=structuredClone(record.vaultAssignment);
  initializeVaultAssignment(record,{newMission:true,random:()=>{throw Error('must not reroll');}});
  assert.deepEqual(record.vaultAssignment,original);
- assert.equal(original.contentVersion,2);
+ assert.equal(original.contentVersion,3);
  assert.match(original.code,/^\d{4}$/);
  assert.match(original.reviewReference,/^\d{4,6}$/);
  assert.equal(applyVaultRule(original.ruleId,original.reviewReference),original.code);
  ensureStation03Experience(record,caseCatalog(record));
- assert.deepEqual(facts(record.station03Experience.rows),facts(baseline.station03Experience.rows),'only descriptions change');
+ assert.deepEqual(facts(record.station03Experience.rows),facts(baseline.station03Experience.rows),'evidence identity and scoring fields stay unchanged');
  const {email,document}=record.vaultAssignment.clueSources;
  assert.equal(document.title,definition.id==='case-03'?'Payments_Oct.xlsx':'Invoice_1048.pdf');
- assert.equal(record.station03Experience.rows.filter((r,i)=>JSON.stringify(r)!==JSON.stringify(baseline.station03Experience.rows[i])).length,1);
+ assert.equal(record.station03Experience.rows.filter((r,i)=>JSON.stringify(r)!==JSON.stringify(baseline.station03Experience.rows[i])).length,2);
  for(const lang of ['ar','en']){
   assert(document.description[lang].includes(original.reviewReference));
   assert.equal(email,null);
-  assert(record.vaultAssignment.clueSources.documents[0].description[lang].includes(vaultRule(original.ruleId)[lang]));
+  assert(!record.vaultAssignment.clueSources.documents[0].description[lang].includes(vaultRule(original.ruleId)[lang]));
+  assert(record.vaultAssignment.emailSnapshot.description[lang]);
   assert(document.description[lang].startsWith(baseline.station03Experience.rows.find(r=>r.id===document.id).description[lang]));
   const publicState=publicMission(record);
   assert(!JSON.stringify(publicState).includes('vaultAssignment'));

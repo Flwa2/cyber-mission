@@ -62,8 +62,8 @@ export function publicVault(record){
  return {version:1,hintLevel:state.hintLevel||0,awardAvailable:state.awardAvailable??600,
   unlockedAt:state.unlockedAt||null,discoveryAcknowledgedAt:state.discoveryAcknowledgedAt||null,
   cooldownUntil:state.cooldownUntil||null,lastAttempt:state.lastAttempt||null,
-  references:{documents:(sources.documents||[sources.document]).filter(Boolean).map(source),document:primary?source(primary):null,email:sources.email?source(sources.email):null},
-  ...(record.vaultAssignment.contentVersion===2&&(state.hintLevel||0)>=2?{hintRule:{en:vaultRule(record.vaultAssignment.ruleId).en,ar:vaultRule(record.vaultAssignment.ruleId).ar}}:{}),
+  references:{documents:(sources.documents||[sources.document]).filter(Boolean).map(source),document:primary?source(primary):null,email:null},
+  ...((state.hintLevel||0)>=2?{hintRule:record.vaultAssignment.contentVersion>=2?{en:vaultRule(record.vaultAssignment.ruleId).en,ar:vaultRule(record.vaultAssignment.ruleId).ar}:{en:'Leave out the first two digits of the review reference.',ar:'احذف أول رقمين من مرجع المراجعة.'}}:{}),
   ...(state.unlockedAt?{discovery:structuredClone(state.discovery)}:{}),
   ...(state.revealedAt?{revealedCode:record.vaultAssignment.code}:{})};
 }

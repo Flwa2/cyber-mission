@@ -28,7 +28,7 @@ export function conversationFor(caseId,names){
    en:[
     l('en','a','A message called "Benefits file available" came into the employee services account, and it has a link. Did anyone notice it?'),
     l('en','b','I saw it in the inbox. It said the benefits file HR-18 was available at benefits-review.example.net, and it looked like the usual HR messages.'),
-    l('en','c','Shortly after that, a package called Account_Update.zip was downloaded from the same address. I cannot say it was ever opened, but the download is recorded.'),
+    l('en','c','Shortly after that, a package called Update.zip was downloaded from the same address. I cannot say it was ever opened, but the download is recorded.'),
     l('en','a','And then?'),
     l('en','c','The account was signed in from a device that is not on the approved workstation list, and after that a rule was added that forwards account notices to archive@review-mail.example.net.'),
     l('en','b','That is strange, because the HR-18 request says nothing about changing mail forwarding.'),
@@ -36,7 +36,7 @@ export function conversationFor(caseId,names){
    ar:[
     l('ar','a','وصلت رسالة بعنوان «ملف المزايا متاح» على حساب خدمات الموظفين، وفيها رابط. أحد انتبه لها؟'),
     l('ar','b','شفتها في صندوق الوارد. كانت تقول إن ملف المزايا HR-18 متاح على benefits-review.example.net، وشكلها يشبه رسائل الموارد البشرية المعتادة.'),
-    l('ar','c','بعدها بقليل نُزّلت حزمة اسمها Account_Update.zip من نفس العنوان. ما أقدر أقول إنها انفتحت، لكن التنزيل مسجّل.'),
+    l('ar','c','بعدها بقليل نُزّلت حزمة اسمها Update.zip من نفس العنوان. ما أقدر أقول إنها انفتحت، لكن التنزيل مسجّل.'),
     l('ar','a','وبعد كذا؟'),
     l('ar','c','سُجّل دخول على الحساب من جهاز مو موجود في قائمة أجهزة المكتب المعتمدة، وبعده أُضيفت قاعدة تحوّل إشعارات الحساب إلى archive@review-mail.example.net.'),
     l('ar','b','هذا غريب، لأن طلب HR-18 ما فيه أي شيء عن تغيير تحويل البريد.'),

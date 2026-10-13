@@ -17,11 +17,23 @@ export const VAULT_RULES=[
  {id:'minus-1-last-2',length:4,apply:ref=>{const [head,tail]=split(ref);return head+pad(tail-1,2);},
   en:'Subtract 1 from the last two digits of the review reference and keep the first two digits.',ar:'اطرح 1 من آخر رقمين من مرجع المراجعة مع إبقاء أول رقمين كما هما.'}
 ];
-const ruleById=id=>VAULT_RULES.find(rule=>rule.id===id);
+// Keep the six legacy rules and generator intact for saved v1/v2 assignments.
+export const VAULT_RULES_V3=[...VAULT_RULES.slice(0,4),
+ {id:'plus-2-last-2',length:4,apply:ref=>ref.slice(0,2)+pad(Number(ref.slice(-2))+2,2),
+  en:'Keep the first two digits. Treat the last two as one number, add 2, and write it in two digits.',ar:'أبقِ أول خانتين. أضف 2 إلى العدد المكوّن من آخر خانتين، واكتب الناتج في خانتين.'},
+ {id:'minus-2-last-2',length:4,apply:ref=>ref.slice(0,2)+pad(Number(ref.slice(-2))-2,2),
+  en:'Keep the first two digits. Treat the last two as one number, subtract 2, and write it in two digits.',ar:'أبقِ أول خانتين. اطرح 2 من العدد المكوّن من آخر خانتين، واكتب الناتج في خانتين.'},
+ {id:'double-last-2',length:4,apply:ref=>ref.slice(0,2)+pad(Number(ref.slice(-2))*2,2),
+  en:'Keep the first two digits. Treat the last two as one number, multiply it by 2, and write it in two digits.',ar:'أبقِ أول خانتين. اضرب العدد المكوّن من آخر خانتين في 2، واكتب الناتج في خانتين.'}
+];
+const ruleById=id=>[...VAULT_RULES,...VAULT_RULES_V3].find(rule=>rule.id===id);
 export const vaultRule=id=>ruleById(id);
 
 // Last two digits must not wrap (99 + 1 or 00 - 1), so the rule stays a simple edit.
 function normalize(ruleId,reference){
+ if(ruleId==='plus-2-last-2'&&Number(reference.slice(-2))>97)return reference.slice(0,2)+'97';
+ if(ruleId==='minus-2-last-2'&&Number(reference.slice(-2))<2)return reference.slice(0,2)+'02';
+ if(ruleId==='double-last-2')return reference.slice(0,2)+pad(1+Number(reference.slice(-2))%49,2);
  if(ruleId==='plus-1-last-2'&&reference.endsWith('99'))return `${reference.slice(0,-2)}98`;
  if(ruleId==='minus-1-last-2'&&reference.endsWith('00'))return `${reference.slice(0,-2)}01`;
  return reference;
@@ -33,6 +45,15 @@ export function createVaultCodeAssignment(random){
  const rule=VAULT_RULES[pick(VAULT_RULES.length)];
  const reference=normalize(rule.id,pad(pick(10**rule.length),rule.length));
  return {ruleId:rule.id,reference,code:applyVaultRule(rule.id,reference)};
+}
+
+export function createVaultCodeAssignmentV3(random){
+ const pick=n=>((random(n)%n)+n)%n;
+ // 15% each extraction, 15% each arithmetic, 10% multiplication.
+ const ticket=pick(100),rule=VAULT_RULES_V3[ticket<90?Math.floor(ticket/15):6];
+ const reference=rule.length===6?pad(pick(1000000),6):
+  pad(pick(100),2)+pad(rule.id==='plus-2-last-2'?pick(98):rule.id==='minus-2-last-2'?2+pick(98):1+pick(49),2);
+ return {ruleId:rule.id,reference,code:rule.apply(reference)};
 }
 
 // A different reference of the same shape that can never open the archive by the real rule.

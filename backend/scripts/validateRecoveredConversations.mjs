@@ -3,7 +3,7 @@ import {CASES} from '../src/caseDefinitions.js';
 import {conversationFor} from '../src/station04Conversations.js';
 import {createNarrativeAssignment,seededNarrativeRandom} from '../../shared/narrativeAssignment.mjs';
 
-const TOKENS={'case-01':['WS-27','share-files.example.net'],'case-02':['HR-18','Account_Update.zip','archive@review-mail.example.net'],'case-03':['FN-63','WS-09','review@vendor-copy.example.org'],'case-04':['PL-85','WS-31']};
+const TOKENS={'case-01':['WS-27','share-files.example.net'],'case-02':['HR-18','Update.zip','archive@review-mail.example.net'],'case-03':['FN-63','WS-09','review@vendor-copy.example.org'],'case-04':['PL-85','WS-31']};
 const now=new Date().toISOString();
 for(const definition of CASES){
  const positions=new Set();const bodies=new Set();

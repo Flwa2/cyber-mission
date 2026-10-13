@@ -29,7 +29,8 @@ if (publicMode) {
       /^\/api\/booth\/stations\/[1-4]\/(sync|poll|activate|heartbeat|release|desk|investigation|resolution)$/.test(path)) ||
       // Event management: authenticated server-side by adminRoutes.
       /^\/api\/admin\/(session|events|events\/[a-z0-9-]+|events\/[a-z0-9-]+\/leaderboard)$/.test(path) && req.method === "GET" ||
-      req.method === "POST" && /^\/api\/admin\/(login|logout|events|events\/[a-z0-9-]+\/(activate|archive)|start)$/.test(path);
+      req.method === "POST" && /^\/api\/admin\/(login|logout|events|events\/[a-z0-9-]+\/(activate|archive)|start)$/.test(path) ||
+      req.method === "DELETE" && /^\/api\/admin\/events\/[a-z0-9-]+$/.test(path);
     if (!allowed) return res.status(404).json({ error: "Not found" });
     next();
   });

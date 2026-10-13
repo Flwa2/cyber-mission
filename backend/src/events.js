@@ -102,6 +102,25 @@ export function archiveEvent(state, id) {
   return summary(state, event);
 }
 
+// Permanent, admin-initiated removal of ONE inactive event and exactly its own missions.
+// Nothing is deleted unless the caller repeats the event's exact current name and participant count.
+export function deleteEvent(state, id, input) {
+  const event = find(state, id);
+  if (!event) throw fail('Event not found', 404);
+  if (state.events.activeEventId === id) throw fail('The active event cannot be deleted', 409);
+  if (event.status === 'draft') throw fail('Only previous events can be deleted', 409);
+  if (typeof input?.confirmName !== 'string' || input.confirmName !== event.name) throw fail('The confirmation name does not match this event', 400);
+  const owned = Object.values(state.missions || {}).filter(r => (r.eventId ?? state.events.legacyEventId) === id);
+  const owns = missionId => owned.some(r => r.missionId === missionId);
+  const live = missionsInProgress(state).filter(b => owns(b.missionId));
+  if (live.length) throw fail('This event has missions in progress and cannot be deleted', 409, { blockers: live });
+  const participants = leaderboardSnapshot(state, id).entries.length;
+  if (input.expectedParticipants !== participants) throw fail('The event changed since it was loaded. Reload and try again.', 409);
+  for (const r of owned) delete state.missions[r.missionId];
+  delete state.events.items[id];
+  return { deleted: true, eventId: id, missionsRemoved: owned.length };
+}
+
 export function eventDetails(state, id) {
   const event = find(state, id);
   if (!event) throw fail('Event not found', 404);

@@ -239,7 +239,7 @@ try {
   await admin('/events', { status: 401 });
   await stop(); await start({ SERVE_FRONTEND: 'true' });
   await admin('/events', { status: 401 });
-  await admin('/unknown', { status: 404 }); assert.equal((await fetch(origin + '/api/booth/events')).status, 200); assert.equal((await fetch(origin + '/api/booth/events/x/y')).status, 404); await admin('/events/x/delete', { method: 'POST', status: 404 }); await admin('/events/x', { method: 'DELETE', status: 404 });
+  await admin('/unknown', { status: 404 }); assert.equal((await fetch(origin + '/api/booth/events')).status, 200); assert.equal((await fetch(origin + '/api/booth/events/x/y')).status, 404); await admin('/events/x/delete', { method: 'POST', status: 404 }); await admin('/events/x', { method: 'DELETE', status: 401 });
   const secureLogin = await admin('/login', { method: 'POST', body: { password: PASSWORD }, headers: { 'X-Forwarded-Proto': 'https' } });
   assert.equal(secureLogin.res.status, 200); assert(/;\s*Secure/.test(secureLogin.res.headers.getSetCookie()[0]));
   assert.equal((await fetch(origin + '/api/missions/CM-HIST01')).status, 404);

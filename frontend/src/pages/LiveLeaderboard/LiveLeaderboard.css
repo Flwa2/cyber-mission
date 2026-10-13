@@ -23,6 +23,7 @@
 .lb-event{max-width:28vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#69e4ff;font-size:14px}
 .lb-plus{width:36px;height:36px;border-radius:50%;border:1px solid #7ecde34d;background:#0a1f2b99;color:#9fdcec;font-size:22px;line-height:1;cursor:pointer;opacity:.55}.lb-plus:hover,.lb-plus:focus-visible{opacity:1;outline:2px solid #43cddc}
 .lb-past{list-style:none;margin:0;padding:0;display:grid;gap:8px}.lb-past button{width:100%;display:flex;justify-content:space-between;align-items:center;min-height:56px;padding:0 18px;border:1px solid #7fc9df24;border-radius:6px;background:#12304160;color:#edf7fc;font:inherit;cursor:pointer}.lb-past small{color:#9bb8c9}
+.lb-past li{display:flex;gap:8px;align-items:stretch}.lb-past li>button:first-child{flex:1;min-width:0}.lb-past .lb-trash{width:44px;flex:none;justify-content:center;padding:0;color:#9bb8c9;opacity:.7}.lb-past .lb-trash:hover,.lb-past .lb-trash:focus-visible{opacity:1;color:#f06d6d;border-color:#f06d6d66}.lb-dialog-actions .lb-delete-confirm{background:#8a2230;border-color:#f06d6d}
 .lb-modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#010509c8;padding:16px}
 .lb-dialog{width:min(440px,100%);display:grid;gap:14px;padding:22px;border-radius:12px;border:1px solid #7ecde34d;background:#07131dfa;color:#edf7fc}.lb-dialog h2{margin:0;font-size:22px}
 .lb-dialog label{display:grid;gap:6px;color:#9fb3c3;font-size:14px}.lb-dialog input{min-height:44px;border-radius:8px;border:1px solid #38c8ff6b;background:#0a1a26;color:#f4f9fc;padding:0 12px;font:inherit}

@@ -1,7 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { Router } from 'express';
 import { persistentStore } from './persistentStore.js';
-import { activateEvent, archiveEvent, createEvent, startEvent, ensureEvents, eventDetails, listEvents } from './events.js';
+import { activateEvent, archiveEvent, createEvent, deleteEvent, startEvent, ensureEvents, eventDetails, listEvents } from './events.js';
 
 // Admin access: one secret password from the environment, a signed HttpOnly session cookie,
 // and server-side checks on every route. Nothing secret ever reaches the frontend.
@@ -73,4 +73,9 @@ router.get('/events/:id', handle(req => eventDetails(persistentStore.read(), req
 router.get('/events/:id/leaderboard', handle(req => eventDetails(persistentStore.read(), req.params.id)));
 router.post('/events/:id/activate', handle(req => persistentStore.transaction(state => activateEvent(state, req.params.id))));
 router.post('/events/:id/archive', handle(req => persistentStore.transaction(state => archiveEvent(state, req.params.id))));
+router.delete('/events/:id', handle(async req => {
+  const result = await persistentStore.transaction(state => deleteEvent(state, req.params.id, req.body));
+  console.error(JSON.stringify({ event: 'event-deleted', eventId: result.eventId, missionsRemoved: result.missionsRemoved }));
+  return result;
+}));
 export default router;

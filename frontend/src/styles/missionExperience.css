@@ -19,6 +19,7 @@
 .exit-mission-dialog { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; margin: auto; padding: 30px; color: #edf6fa; border: 1px solid #93cde52b; border-top-color: #ec536366; border-radius: 10px; background: radial-gradient(ellipse at top left, #8b152321, transparent 65%), #071018f5; box-shadow: 0 30px 100px #000b; }
 .exit-mission-dialog::backdrop { background: #010409bd; backdrop-filter: blur(5px); }
 .exit-marker { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: 20px; border: 1px solid #fa596655; color: #f77d89; border-radius: 6px; }
+.exit-mission-dialog .exit-error { color: #ff8b99; font-size: 13px; margin: 10px 0 0; }
 .exit-mission-dialog .eyebrow { font-size: 10px; color: #d5929b; }
 .exit-mission-dialog h2 { font-size: 24px; text-transform: uppercase; margin-bottom: 12px; }
 .exit-mission-dialog #exit-description { color: #9eadba; font-size: 14px; line-height: 1.6; }
@@ -191,7 +192,7 @@
 .panel-close svg { width: 20px; height: 20px; }
 .mission-dialog button:focus-visible { outline: 2px solid #70dfff; outline-offset: 2px; }
 .mission-dialog .action-grid { gap: 0; }
-.mission-dialog .action-grid button { display: grid; grid-template-columns: 42px 1fr 24px; min-height: 76px; padding: 14px 12px; border: 0; border-bottom: 1px solid #78bddf20; border-radius: 0; background: transparent; }
+.mission-dialog .action-grid button { display: grid; grid-template-columns: 42px 1fr; min-height: 76px; padding: 14px 12px; border: 0; border-bottom: 1px solid #78bddf20; border-radius: 0; background: transparent; }
 .mission-dialog .action-grid button:last-child { border-bottom: 0; }
 .mission-dialog .action-grid button::after { display: none; }
 .mission-dialog .action-grid button > svg:first-child { grid-row: 1 / span 2; align-self: center; width: 24px; height: 24px; color: #57c9e2; }

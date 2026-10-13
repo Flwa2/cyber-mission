@@ -13,8 +13,18 @@ export default function Vault({vault,onAction,busy,error}){
  useEffect(()=>()=>{audio.current?.close().catch(()=>{});},[]);
  useEffect(()=>{if(source&&!dialog.current.open)dialog.current.showModal();else if(!source&&dialog.current.open)dialog.current.close();},[source]);
  useEffect(()=>{
-  if(vault.unlockedAt&&!wasUnlocked.current){setOpening(true);const id=setTimeout(()=>setOpening(false),900);wasUnlocked.current=true;return()=>clearTimeout(id);}
+  if(vault.unlockedAt&&!wasUnlocked.current){setOpening(true);const id=setTimeout(()=>setOpening(false),900);wasUnlocked.current=true;unlockChime();return()=>clearTimeout(id);}
  },[vault.unlockedAt]);
+ function unlockChime(){
+  try{
+   const Context=window.AudioContext||window.webkitAudioContext;if(!Context)return;
+   const context=audio.current ||= new Context();context.resume().catch(()=>{});
+   [[660,0],[880,.11],[1320,.22]].forEach(([frequency,delay])=>{const oscillator=context.createOscillator(),gain=context.createGain(),at=context.currentTime+delay;
+    oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,at);
+    gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(.05,at+.02);gain.gain.exponentialRampToValueAtTime(.001,at+.35);
+    oscillator.connect(gain);gain.connect(context.destination);oscillator.start(at);oscillator.stop(at+.4);});
+  }catch{/* Audio is optional when browser/device policy disallows it. */}
+ }
  function clickSound(){
   try{
    const Context=window.AudioContext||window.webkitAudioContext;if(!Context)return;
@@ -48,7 +58,8 @@ export default function Vault({vault,onAction,busy,error}){
   window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
  },[source,vault.unlockedAt,code,blocked,remaining]);
  const documents=vault.references.documents||[vault.references.document].filter(Boolean);
- const selected=source?.startsWith('document-')?documents[Number(source.slice(9))]:null;
+ const email=vault.references.email;
+ const selected=source==='email'?email:source?.startsWith('document-')?documents[Number(source.slice(9))]:null;
  const nextAward={1:500,2:300,3:50}[confirmLevel];
  const errors={'Please wait before trying again':copy('Please wait before trying again.','يرجى الانتظار قبل المحاولة مجددًا.'),'Enter four digits':copy('Enter four digits.','أدخل أربعة أرقام.'),'Mission time expired':copy('Mission time has expired.','انتهى وقت المهمة.')};
  return <section className={`vault-workspace${vault.unlockedAt?' is-unlocked':''}${opening?' is-opening':''}`} aria-labelledby="vault-title" dir={ar?'rtl':'ltr'}>
@@ -72,14 +83,14 @@ export default function Vault({vault,onAction,busy,error}){
   </div></div>
   <div className="vault-corner vault-corner-left">
    <button className="vault-tool" aria-expanded={panel==='evidence'} onClick={()=>{setConfirmLevel(null);setPanel(p=>p==='evidence'?null:'evidence')}}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v5M6 3v18h6M14 3v4h4M9 9h4M9 13h2"/><circle cx="16" cy="17" r="3"/><path d="m18.5 19.5 2.5 2.5"/></svg><span>{copy('Review evidence','مراجعة الأدلة')}</span></button>
-   {panel==='evidence'&&<div className="vault-popover"><span>{copy('Archive documents','مستندات الأرشيف')}</span>{documents.map((item,index)=><button key={item.id||index} onClick={()=>{setPanel(null);setSource(`document-${index}`);}}><bdi>{display(item.title)}</bdi></button>)}</div>}
+   {panel==='evidence'&&<div className="vault-popover"><span>{copy('Archive documents','مستندات الأرشيف')}</span>{documents.map((item,index)=><button key={item.id||index} onClick={()=>{setPanel(null);setSource(`document-${index}`);}}><bdi>{display(item.title)}</bdi></button>)}{email&&<button onClick={()=>{setPanel(null);setSource('email');}}><bdi>{display(email.title)}</bdi></button>}</div>}
   </div>
   {!vault.unlockedAt&&<div className="vault-corner vault-corner-right">
    <button className="vault-tool" aria-expanded={panel==='hint'} onClick={()=>setPanel(p=>p==='hint'?null:'hint')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.9.7 1.5 1.6 1.5 2.6v.5h4v-.5c0-1 .6-1.9 1.5-2.6A6 6 0 0 0 12 3Z"/></svg><span>{copy('Hint','تلميح')}</span>{vault.hintLevel>0&&<b className="vault-badge">{vault.hintLevel}</b>}</button>
    {panel==='hint'&&<div className="vault-popover vault-hints">
     {!confirmLevel&&<><p>{copy(`Vault score: ${vault.awardAvailable??600}/600. Hints reduce this score.`,`نقاط الخزنة: ${vault.awardAvailable??600}/600. التلميحات تخصم من النقاط.`)}</p>
      {vault.hintLevel>=1&&<p>{copy('The required file is: ','الملف المطلوب هو: ')}<bdi>{display(documents[0]?.title)}</bdi></p>}
-     {vault.hintLevel>=2&&<p>{copy('Use the review reference found inside the document.','استخدم مرجع المراجعة الموجود داخل الملف.')}</p>}
+     {vault.hintLevel>=2&&<p>{vault.hintRule?display(vault.hintRule):copy('Use the review reference found inside the document.','استخدم مرجع المراجعة الموجود داخل الملف.')}</p>}
      {vault.hintLevel<3&&<button disabled={blocked} onClick={()=>setConfirmLevel(vault.hintLevel+1)}>{vault.hintLevel===0?copy('Use Hint 1 · 100 points','استخدام التلميح 1 · خصم 100 نقطة'):vault.hintLevel===1?copy('Use Hint 2 · 200 points','استخدام التلميح 2 · خصم 200 نقطة'):copy('Reveal code · 250 points','إظهار الرمز · خصم 250 نقطة')}</button>}
     </>}
     {confirmLevel&&<div className="vault-inline-confirm">

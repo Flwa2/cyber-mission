@@ -1,12 +1,13 @@
 import {randomInt} from 'node:crypto';
+import {createVaultCodeAssignment,decoyReference,vaultRule} from './station04VaultRules.js';
 
 // Private record sibling, never part of mission/publicStation03Experience.
 // Only the new-record creation boundary may opt a mission into this version.
 export function initializeVaultAssignment(record,{newMission=false,random=randomInt}={}){
  if(!newMission||record.vaultAssignment)return;
- const code=String(random(10000)).padStart(4,'0');
- record.vaultAssignment={version:1,assignedAt:new Date().toISOString(),code,
-  reviewReference:`${10+random(90)}${code}`,clueSources:null};
+ const {ruleId,reference,code}=createVaultCodeAssignment(random);
+ record.vaultAssignment={version:1,contentVersion:2,assignedAt:new Date().toISOString(),ruleId,reference,code,
+  reviewReference:reference,clueSources:null};
 }
 
 // Run once after the existing narrative/readability transforms on a NEW snapshot.
@@ -20,7 +21,11 @@ export function bindVaultClues(record){
  const mail=rows.find(r=>r.id===(finance?'finance:review-mail':`case:${definition.personId}:mail`));
  const document=rows.find(r=>r.id===(finance?'case:export':'case:reem:document'));
  if(!mail||!document||document.title!==(finance?'Payments_Oct.xlsx':'Invoice_1048.pdf'))throw new Error('Vault clue source is unavailable');
- const note={
+ const rule=vault.contentVersion===2?vaultRule(vault.ruleId):null;
+ const note=rule?{
+  en:`The archived copy opens with the review reference on the ${finance?'payment worksheet':'revised invoice'}. ${rule.en} I left the working copy in the team folder.`,
+  ar:`تُفتح النسخة المؤرشفة بمرجع المراجعة المدوّن على ${finance?'كشف المدفوعات':'الفاتورة المعدلة'}. ${rule.ar} تركت نسخة العمل في مجلد الفريق.`
+ }:{
   en:`The archived copy opens with the review reference on the ${finance?'payment worksheet':'revised invoice'}, leaving out the first two digits. I left the working copy in the team folder.`,
   ar:`تُفتح النسخة المؤرشفة بمرجع المراجعة المدوّن على ${finance?'كشف المدفوعات':'الفاتورة المعدلة'}، بعد حذف أول رقمين. تركت نسخة العمل في مجلد الفريق.`
  };
@@ -34,11 +39,12 @@ export function bindVaultClues(record){
  // collected evidence and do not change Station 03 selection or its score.
  const date=new Date(document.timestamp).toISOString().slice(0,10);
  const code=Number(vault.code);
- const safeReference=(seed)=>{
+ const legacyReference=(seed)=>{
   let value=100000+((seed*7919+code*17)%900000);
   while(String(value).slice(-4)===vault.code)value=100000+((value-100000+137)%900000);
   return String(value).padStart(6,'0');
  };
+ const safeReference=rule?seed=>decoyReference(vault.ruleId,vault.reference,vault.code,seed):legacyReference;
  const distractors={
   'case-01':[
    ['Access_Request_317.pdf',safeReference(317),{

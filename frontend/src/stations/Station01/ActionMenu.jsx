@@ -12,7 +12,7 @@ export default function ActionMenu({ onClose, onAction }) {
   return <InspectorPanel title={t("Message Actions")} onClose={onClose}>
     <div className="action-grid">{choices.map(([action, title, description]) =>
       <button type="button" key={action} onClick={() => onAction(action)}>
-        <MissionIcon name={action} /><span>{t(title)}</span><small>{t(description)}</small><MissionIcon name="continue" className="row-arrow" />
+        <MissionIcon name={action} /><span>{t(title)}</span><small>{t(description)}</small>
       </button>
     )}</div>
   </InspectorPanel>;

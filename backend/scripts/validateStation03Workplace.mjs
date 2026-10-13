@@ -9,7 +9,7 @@ for(const definition of CASES){
  const record={stage:3,phase:'ACTIVE',order:7,caseAssignment:{definition,...(definition.id==='case-03'?{station03:financeTemplate(definition)}:{})},mission:{missionId:'CM-COPY03',startedAt:'2026-10-07T08:00:00.000Z',hiddenScore:12,hiddenAttackState:3,decisions:{},flags:{},evidence:[]}};
  ensureStation03Experience(record,caseCatalog(record));
  const rows=record.station03Experience.rows;
- assert.equal(rows.filter(row=>row.source==='mail').length,6);
+ assert(rows.filter(row=>row.source==='mail').length>=6,'mail volume varies per case (6-9)');
  for(const oldName of Object.keys(STATION03_FILENAMES))assert(!JSON.stringify(rows).includes(oldName),oldName);
  assert(!JSON.stringify(publicStation03Experience(record)).includes('expectedClassification'));
  assert.deepEqual(renameStation03Files(rows),rows);

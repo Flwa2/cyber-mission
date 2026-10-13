@@ -38,7 +38,7 @@ assert.deepEqual(challenge.questions.map(question=>question.context.subject.en),
 ]);
 assert.equal(challenge.questions[0].context.from,'data.office@environment-fund.invalid');
 assert.equal(challenge.questions[1].context.from,'projects@environment-fund.invalid');
-assert.equal(challenge.questions[2].context.from,'ahmed@partner-government.invalid');
+assert.equal(challenge.questions[2].context.from,'faisal@partner-government.invalid');
 for(const question of challenge.questions){
  assert(!question.context.from.includes('example'));
  assert(question.context.from.endsWith('.invalid'));

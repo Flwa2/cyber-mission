@@ -1,4 +1,4 @@
-﻿import {AsyncLocalStorage} from 'node:async_hooks';
+import {AsyncLocalStorage} from 'node:async_hooks';
 import {createHash} from 'node:crypto';
 import {resumeMissionTimer} from './missionTimer.js';
 import {publicMission} from './caseEngine.js';
@@ -8,7 +8,7 @@ const reject=(res,status,error)=>res.status(status).json({error});
 export const independentMiddleware=(store,project)=>(req,res,next)=>{
  const {id,station,action}=req.params,token=req.body.accessToken;
  if(!/^CM-[A-Z0-9]{6}$/.test(id)||typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token))return reject(res,401,'Invalid mission credential');
- if(!['sync','poll','activate','desk','investigation','resolution'].includes(action)||! /^[1-4]$/.test(station))return reject(res,400,'Invalid mission operation');
+ if(!['sync','poll','activate','desk','investigation','resolution','abandon'].includes(action)||! /^[1-4]$/.test(station))return reject(res,400,'Invalid mission operation');
  const tokenHash=createHash('sha256').update(token).digest('hex');
  const record=(store.peek?store.peek():store.read()).missions[id];
  if(record&&(record.mode!=='independent-v1'||record.accessHash!==tokenHash))return reject(res,403,'Mission access denied');
@@ -18,10 +18,10 @@ export const independentMiddleware=(store,project)=>(req,res,next)=>{
   const mission=req.body.mission;
   if(mission?.missionId!==id||mission.currentStation!==1||mission.decisions?.station01?.completedAt||mission.completedStations?.length)return reject(res,400,'Start at Station 01');
  }
- if(record&&action==='poll'&&['COMPLETED','TIMED_OUT'].includes(record.phase))return res.json({mission:project(record),revision:record.revision,device:{state:record.phase,missionId:id}});
- if(record&&action!=='poll'&&!(action==='sync'&&station==='1')&&Number(station)!==record.stage)return res.status(409).json({error:'Mission advanced',conflict:{mission:project(record),revision:record.revision,device:{state:record.phase,missionId:id}}});
+ if(record&&action==='poll'&&['COMPLETED','TIMED_OUT','ABANDONED'].includes(record.phase))return res.json({mission:project(record),revision:record.revision,device:{state:record.phase,missionId:id}});
+ if(record&&action!=='poll'&&action!=='abandon'&&!(action==='sync'&&station==='1')&&Number(station)!==record.stage)return res.status(409).json({error:'Mission advanced',conflict:{mission:project(record),revision:record.revision,device:{state:record.phase,missionId:id}}});
  req.body={...req.body,deviceId:`solo-${tokenHash}`,missionId:id};
- req.url=`/stations/${action==='poll'&&record?record.stage:station}/${action}`;
+ req.url=`/stations/${(action==='poll'||action==='abandon')&&record?record.stage:station}/${action}`;
  independentContext.run({id,tokenHash},next);
 };
 

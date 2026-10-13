@@ -7,6 +7,7 @@ import {ACTIVE_SMS_SCENARIOS} from '../../frontend/src/data/activeSmsScenarios.j
 import {financeTemplate,station03TemplateRecords} from './station03Cases.js';
 import {publicStation03Experience} from './station03Experience.js';
 import {publicNarrativeAssignment} from '../../shared/narrativeAssignment.mjs';
+import {mapCasePeople,localizeLegacyNames,usesRefinedContent} from './casePeopleMap.js';
 import {publicVault} from './station04VaultFlow.js';
 import {missionTimerSnapshot} from './missionTimer.js';
 import {station04Result} from './station04Result.js';
@@ -61,6 +62,15 @@ export function physicalClues(record){
  const c=record.caseAssignment?.definition;if(!c)return null;
  const badge=PEOPLE.find(p=>p.id===c.badgeId),document=PEOPLE.find(p=>p.id===c.documentId);
  const assignment=record.mission.narrativeAssignment;
+ if(usesRefinedContent(record)&&assignment&&!assignment.migration){
+  const mapped=mapCasePeople(c,assignment),entry=id=>mapped.find(p=>p.id===id);
+  const badgeEntry=entry(c.badgeId),documentEntry=entry(c.documentId),preparedBy=assignment.choices.find(p=>p.id===assignment.associatedPersonId);
+  const badgeName=badgeEntry.person.id==='office'?text('Visitor — Office Coordination','زائر — تنسيق المكاتب'):badgeEntry.person.name;
+  return {
+   badge:[['Name',badgeName],['Department',badgeEntry.person.role],['Assigned workstation',badgeEntry.device]],
+   documents:[['Reference',c.reference],[text('Prepared by','إعداد'),preparedBy.name],['Employee',documentEntry.person.name],['Workstation',documentEntry.device],['Notes',localizeLegacyNames(c.physical,mapped)]]
+  };
+ }
  const preparer=assignment?.choices.find(p=>p.id===assignment.associatedPersonId)?.name||text('Sara','سارة');
  return {
   badge:[['Name',badge.name],['Department',badge.department],['Assigned workstation',badge.device]],
@@ -73,7 +83,7 @@ export function publicMission(record){
  delete m.station04Result;
  const finalFeedback=station04Result(record);if(finalFeedback)m.station04Result=finalFeedback;
  m.timer=missionTimerSnapshot(record);
- if(record.mode==='independent-v1'){m.independent=true;m.timer.activeMs=record.timer.activeMs;if(record.phase==='COMPLETED')m.finalScore={total:record.scoring?.total||0,maximum:5000,stations:Object.fromEntries(Object.entries(record.scoring?.stations||{}).map(([id,score])=>[id,{earned:score.earned,maximum:score.maximum}]))};}
+ if(record.mode==='independent-v1'){m.independent=true;m.timer.activeMs=record.timer.activeMs;if(record.phase==='COMPLETED')m.finalScore={total:record.scoring?.total||0,maximum:record.scoring?.maximum||5000,stations:Object.fromEntries(Object.entries(record.scoring?.stations||{}).map(([id,score])=>[id,{earned:score.earned,maximum:score.maximum}]))};}
  delete m.vaultAssignment;
  delete m.vault;delete m.vaultState;
  const vault=publicVault(record);if(vault)m.vault=vault;

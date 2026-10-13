@@ -1,4 +1,4 @@
-﻿import {existsSync,readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 
 // Event scope: missions listed here predate the current event and stay in storage but are hidden.
 const EVENT_FILE=new URL('../data/leaderboard-event.json',import.meta.url);
@@ -20,11 +20,11 @@ export function legacyExcludedMissionIds(state) {
 }
 const toEntry=r=>({
  missionId:r.missionId,playerName:r.mission.playerName,avatarId:r.mission.avatarId||null,
- score:r.scoring.total,maximum:5000,
+ score:r.scoring.total,maximum:r.scoring.maximum||5000,
  completedStations:[1,2,3,4].filter(n=>r.scoring.stations[`station0${n}`]).length,
  joinedAt:r.scoring.stations.station01.finalizedAt
 });
-const scored=r=>r.scoring?.stations?.station01&&typeof r.mission?.playerName==='string'&&typeof r.missionId==='string'&&Number.isFinite(r.scoring.total);
+const scored=r=>r.phase!=='ABANDONED'&&r.scoring?.stations?.station01&&typeof r.mission?.playerName==='string'&&typeof r.missionId==='string'&&Number.isFinite(r.scoring.total);
 const isDev=r=>r.devPreview||r.mission?.devPreview||r.phase==='DEV_ARCHIVED';
 // Ties keep the earlier Station01 finisher first, then Mission ID. No elapsed-time comparison.
 const rank=entries=>entries.sort((a,b)=>b.score-a.score||a.joinedAt.localeCompare(b.joinedAt)||a.missionId.localeCompare(b.missionId)).map(({joinedAt,...entry},i)=>({...entry,rank:i+1}));

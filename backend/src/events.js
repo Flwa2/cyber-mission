@@ -50,7 +50,7 @@ export function missionsInProgress(state) {
 
 function summary(state, event) {
   const participants = leaderboardSnapshot(state, event.id).entries.length;
-  const missionCount = Object.values(state.missions || {}).filter(r => (r.eventId ?? state.events.legacyEventId) === event.id).length;
+  const missionCount = Object.values(state.missions || {}).filter(r => r.phase !== 'ABANDONED' && (r.eventId ?? state.events.legacyEventId) === event.id).length;
   return { id: event.id, name: event.name, date: event.date, sector: event.sector, status: event.status, createdAt: event.createdAt, activatedAt: event.activatedAt, archivedAt: event.archivedAt, participants, hiddenCount: hiddenEventMissions(state, event.id).length, missionCount, active: event.id === state.events.activeEventId };
 }
 

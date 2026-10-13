@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import {scoreMessage,scoreDesk,scoreEvidence,scoreFinancial,scoreResponse,finalizeStationScore} from '../src/progressiveScoring.js';
 import {SMS_SCENARIOS} from '../../frontend/src/data/smsScenarios.js';
 import {CASES} from '../src/caseDefinitions.js';
@@ -75,19 +75,19 @@ try{
  result=await claim(2);
  for(const objectId of Object.keys(safe))result=await api(2,'desk',{objectId,actionId:'report',revision:result.revision});
  assert.equal(disk().scoring.total,600);
- result=await api(2,'desk',{complete:true,revision:result.revision});assert.equal(disk().scoring.total,1600);
- await api(2,'desk',{complete:true,revision:0});assert.equal(disk().scoring.total,1600);
- await checkLeaderboard(1600,2);result=await claim(3);const rows=disk().station03Experience.rows;
+ result=await api(2,'desk',{complete:true,revision:result.revision});assert.equal(disk().scoring.total,1750);
+ await api(2,'desk',{complete:true,revision:0});assert.equal(disk().scoring.total,1750);
+ await checkLeaderboard(1750,2);result=await claim(3);const rows=disk().station03Experience.rows;
  for(const row of rows.filter(x=>x.isIncidentRelevant)){
   result=await api(3,'investigation',{action:'inspect',itemId:row.id,revision:result.revision});
   result=await api(3,'investigation',{action:'add',itemId:row.id,revision:result.revision});
  }
  result=await api(3,'investigation',{action:'begin-classification',revision:result.revision});
  for(const q of disk().station03Experience.dataChallenge.questions)result=await api(3,'investigation',{action:'answer',itemId:q.id,selectedClassification:q.expectedAnswer,revision:result.revision});
- assert.equal(disk().scoring.total,1600);
- result=await api(3,'investigation',{action:'complete',revision:result.revision});assert.equal(disk().scoring.total,3100);
- await api(3,'investigation',{action:'complete',revision:0});assert.equal(disk().scoring.total,3100);
- await checkLeaderboard(3100,3);const saved=JSON.stringify(disk().scoring);await stop();await start();assert.equal(JSON.stringify(disk().scoring),saved);
+ assert.equal(disk().scoring.total,1750);
+ result=await api(3,'investigation',{action:'complete',revision:result.revision});assert.equal(disk().scoring.total,3250);
+ await api(3,'investigation',{action:'complete',revision:0});assert.equal(disk().scoring.total,3250);
+ await checkLeaderboard(3250,3);const saved=JSON.stringify(disk().scoring);await stop();await start();assert.equal(JSON.stringify(disk().scoring),saved);
  result=await claim(4);
  if(disk().vaultAssignment){
   result=await api(4,'resolution',{action:'vault-attempt',code:disk().vaultAssignment.code,requestId:'scoring-vault-open',revision:result.revision});
@@ -97,16 +97,16 @@ try{
   result=await api(4,'resolution',{action:'select-response',phase,selection,revision:result.revision});
   if(phase!=='evidence')result=await api(4,'resolution',{action:'advance-response',revision:result.revision});
  }
- result=await api(4,'resolution',{action:'submit-response',revision:result.revision});assert.equal(disk().scoring.total,4600);assert.equal(disk().mission.decisions.station04.privateScore.total,1500);
- await checkLeaderboard(4600,4);const final=disk();await api(4,'resolution',{action:'submit-response',revision:0});assert.deepEqual(disk().scoring,final.scoring);
- await stop();await start();await checkLeaderboard(4600,4);assert.deepEqual(disk().scoring,final.scoring);assert.equal(disk().mission.decisions.station04.completedAt,final.mission.decisions.station04.completedAt);
- assert.equal(final.mission.startedAt,now);assert.equal(final.mission.missionId,mission.missionId);assert.equal(final.scoring.maximum,5000);assert.equal(Object.keys(final.scoring.stations).length,4);
+ result=await api(4,'resolution',{action:'submit-response',revision:result.revision});assert.equal(disk().scoring.total,4750);assert.equal(disk().mission.decisions.station04.privateScore.total,1500);
+ await checkLeaderboard(4750,4);const final=disk();await api(4,'resolution',{action:'submit-response',revision:0});assert.deepEqual(disk().scoring,final.scoring);
+ await stop();await start();await checkLeaderboard(4750,4);assert.deepEqual(disk().scoring,final.scoring);assert.equal(disk().mission.decisions.station04.completedAt,final.mission.decisions.station04.completedAt);
+ assert.equal(final.mission.startedAt,now);assert.equal(final.mission.missionId,mission.missionId);assert.equal(final.scoring.maximum,5150);assert.equal(Object.keys(final.scoring.stations).length,4);
  assert(!JSON.stringify(publicMission(final)).includes('action-5000-v1'));
  // A safe, otherwise identical final run reaches exactly the approved maximum.
  const perfect=structuredClone(final);delete perfect.scoring;perfect.mission.decisions.station01.linkOpened=false;
  for(let station=1;station<=4;station++)assert(finalizeStationScore(perfect,station));
- assert.equal(perfect.scoring.total,5000);for(let station=1;station<=4;station++)assert.equal(finalizeStationScore(perfect,station),false);
- const resumed=structuredClone(final);delete resumed.scoring;assert(finalizeStationScore(resumed,4));assert.equal(resumed.scoring.total,4600,'older completed decisions recovered at next boundary');
+ assert.equal(perfect.scoring.total,5150);assert.equal(perfect.scoring.maximum,5150);{const old=structuredClone(perfect);delete old.scoring;delete old.scoreModel;for(let station=1;station<=4;station++)finalizeStationScore(old,station);assert.equal(old.scoring.total,5000,'historical model unchanged');assert.equal(old.scoring.maximum,5000);assert.equal(old.scoring.hiddenBonus,undefined);}for(let station=1;station<=4;station++)assert.equal(finalizeStationScore(perfect,station),false);
+ const resumed=structuredClone(final);delete resumed.scoring;assert(finalizeStationScore(resumed,4));assert.equal(resumed.scoring.total,4750,'older completed decisions recovered at next boundary');
  const timed=structuredClone(final);delete timed.scoring.stations.station04;timed.scoring.total=3100;timed.mission.status='timed-out';
  const beforeTimeout=JSON.stringify(timed.scoring);assert.equal(finalizeStationScore(timed,4),false);assert.equal(JSON.stringify(timed.scoring),beforeTimeout);
  const ledger=JSON.stringify(final.scoring);final.mission.hiddenScore=-999999;final.mission.decisions.station04.privateScore.total=999999;

@@ -8,7 +8,7 @@ import './Station02.css';
 import StationCompletion from '../../components/StationCompletion/StationCompletion.jsx';
 import { DESK_ART, DESK_HOTSPOTS } from './deskScene.js';
 
-export default function Station02({ mission, onDecision, onComplete, busy=false, error='', completed=false }) {
+export default function Station02({ mission, onDecision, onComplete, onExit, busy=false, error='', completed=false }) {
   const { t, language } = useTranslation();
   const display=value=>typeof value==='object'?value[language]||value.en:t(value);
   const objects=localizeDisplay(DESK_OBJECTS,language).map(object=>({
@@ -38,7 +38,7 @@ export default function Station02({ mission, onDecision, onComplete, busy=false,
   }
   return <main className={completed?"screen station-screen station01-screen":"desk-screen"}>
     {completed&&<div className="incident-room" aria-hidden="true"><div className="room-monitor"/><div className="room-beacon"/><div className="room-glass"/><div className="room-desk"/></div>}
-    <header className="mission-topbar desk-topbar"><GameplayHud mission={mission} currentStation={2}/></header>
+    <header className="mission-topbar desk-topbar"><GameplayHud mission={mission} currentStation={2} onExit={onExit}/></header>
     {completed?<StationCompletion mission={mission} stationNumber={2}/>:<>
     <section className="desk-stage" ref={sceneRef} aria-label={t("The desk investigation")}>
       <div className="desk-image-plane" style={size}>
@@ -46,7 +46,7 @@ export default function Station02({ mission, onDecision, onComplete, busy=false,
         {!completed&&objects.map(object=><button key={object.id} className={`desk-hotspot ${items[object.id]?'is-recorded':''} ${selected===object.id?'is-selected':''}`} style={{left:`${DESK_HOTSPOTS[object.id].x}%`,top:`${DESK_HOTSPOTS[object.id].y}%`}} aria-label={t("Inspect")+" "+object.name} aria-pressed={selected===object.id} onClick={()=>{setSelected(object.id);setNotice('');}}><span aria-hidden="true"/></button>)}
       </div>
       {!completed&&<aside className={`desk-intro ${item?'has-selection':''}`}><p className="eyebrow">{t("STATION 02")}</p><h1>{t("Incident Desk")}</h1><p className="desk-lead">{t("This desk has been identified within the incident area.")}</p><p>{t("Inspect the items and make your decisions carefully.")}</p><ol><li><span>01</span>{t("Select an item")}</li><li><span>02</span>{t("Inspect it")}</li><li><span>03</span>{t("Choose an action")}</li></ol><p className="desk-tip"><span>{t("TIP")}</span>{t("Look closely. Not everything here is what it seems.")}</p></aside>}
-      {!completed&&item&&<aside className="desk-inspector" style={mission.caseFile?{maxHeight:"94%",overflowY:"auto"}:undefined} aria-label={t("ITEM INSPECTION")+": "+item.name} onKeyDown={e=>{if(e.key==='Escape')setSelected(null);}}>
+      {!completed&&item&&<aside className="desk-inspector" aria-label={t("ITEM INSPECTION")+": "+item.name} onKeyDown={e=>{if(e.key==='Escape')setSelected(null);}}>
         <header><div><p className="eyebrow">{t("ITEM INSPECTION")}</p><h2>{item.name}</h2></div><button className="panel-close" aria-label={t("Close inspection")} onClick={()=>setSelected(null)}><MissionIcon name="close"/></button></header>
         <dl>{item.details.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
         {items[item.id]?<div className="desk-recorded"><p>{t("DECISION RECORDED")}</p><strong>{item.actions.find(([id])=>id===items[item.id].actionId)?.[1]}</strong><p>{t("Select another item to continue.")}</p></div>:<><p className="desk-question">{t("What would you do?")}</p><div className="desk-actions">{item.actions.map(([id,label])=><button key={id} disabled={busy} onClick={()=>choose(id)}><span>{label}</span><span aria-hidden="true">{t("→")}</span></button>)}</div></>}

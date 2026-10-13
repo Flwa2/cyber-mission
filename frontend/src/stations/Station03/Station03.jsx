@@ -10,7 +10,7 @@ import ClassificationPhase from './ClassificationPhase.jsx';
 import {workstationRecord} from './workstationPresentation.js';
 
 
-export default function Station03({mission,onAction,busy=false,error='',completed=false}) {
+export default function Station03({mission,onAction,onExit,busy=false,error='',completed=false}) {
  const {t,language}=useTranslation();
  // Window state is presentation only. Investigation selections remain backend-owned.
  const [windows,setWindows]=useState([]),[launcher,setLauncher]=useState(false);
@@ -37,7 +37,7 @@ export default function Station03({mission,onAction,busy=false,error='',complete
  const close=id=>setWindows(all=>all.filter(w=>w.id!==id));
  const stamp=value=>new Date(value).toLocaleString(language==='ar'?'ar-SA-u-ca-gregory-nu-latn':'en-GB',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
  return <main className={completed?'screen station-screen station01-screen':'workstation-screen'}>
-  <header className="mission-topbar workstation-topbar"><GameplayHud mission={mission} currentStation={3}/></header>
+  <header className="mission-topbar workstation-topbar"><GameplayHud mission={mission} currentStation={3} onExit={onExit}/></header>
   {completed?<StationCompletion mission={mission} stationNumber={3}/>:<div className={`workstation-layout${inChallenge?' in-classification':''}`}>
    <section className="workstation-desktop" aria-label={t('Digital Investigation')}>
     <div className="desktop-surface">

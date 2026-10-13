@@ -73,6 +73,18 @@ export function MissionProvider({ children }) {
         missionService.clearMission();
         setMission(null);
       },
+      // Confirmed exit: the server records the mission as abandoned before this screen detaches.
+      async abandonMission() {
+        if (mission?.startedAt) {
+          try { await stationRequest("abandon", { missionId: mission.missionId }); }
+          catch (error) { if (error?.transient) throw error; }
+          if (!INDEPENDENT_MODE) {
+            try { await stationRequest("release", { missionId: mission.missionId, immediate: true }); } catch { /* lease expires on its own */ }
+          }
+        }
+        missionService.clearMission();
+        setMission(null);
+      },
       async resetMission() {
         if (mission?.startedAt && !INDEPENDENT_MODE) {
           try {

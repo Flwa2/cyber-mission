@@ -17,14 +17,29 @@ export function scoreDesk(items={}) {
  const allocations={usb:{report:200,leave:120,connect:-200},badge:{report:200,leave:40,use:-200},documents:{secure:200,report:200,leave:20,read:-150},cable:{report:150,leave:105,connect:-150},qr:{report:150,leave:105,scan:-150},power:{report:100,leave:70,use:-100}};
  return clamp(Object.entries(allocations).reduce((sum,[id,options])=>sum+(options[items[id]?.actionId]??0),0),1000);
 }
-export function scoreEvidence(rows=[],selectedIds=[]) {
+// Hidden Station 02 bonus: the number of objects handled with the intended safe action.
+// It only ever feeds the overall total and ranking; it is never part of a station score or a public breakdown.
+const SAFE_DESK_ACTIONS={usb:["report"],badge:["report"],documents:["secure","report"],cable:["report"],qr:["report"],power:["report"]};
+export const HIDDEN_BONUS_MAX=150;
+export function hiddenDeskBonus(items={}) {
+ const correct=Object.entries(SAFE_DESK_ACTIONS).filter(([id,safe])=>safe.includes(items[id]?.actionId)).length;
+ return correct>=6?150:correct===5?100:correct===4?50:0;
+}
+// Supporting records for the incident or the vault reference. Selecting them is neither rewarded nor penalised.
+export function neutralEvidenceIds(record){
+ if(record?.scoreModel!=='bonus-v1')return [];
+ const d=record.caseAssignment?.definition;
+ if(!d)return [];
+ return d.id==='case-03'?['finance:review-mail','case:export','finance:sharing-mail','finance:recent-export','finance:recent-delete']:[`case:${d.personId}:mail`,'case:reem:document'];
+}
+export function scoreEvidence(rows=[],selectedIds=[],neutralIds=[]) {
  // Use the private, mission-specific catalog, not client evidence tags or legacy case IDs.
  const catalog=[...new Map(rows.filter(r=>r.id!=='challenge:financial-summary'&&r.id!=='financial-summary').map(r=>[r.id,r])).values()];
  const valid=catalog.filter(r=>r.isIncidentRelevant===true).sort((a,b)=>a.id.localeCompare(b.id));
  const selected=new Set(selectedIds);
  const allocations=Object.fromEntries(valid.map((r,i)=>[r.id,Math.floor(900/valid.length)+(i<900%valid.length?1:0)]));
  const earned=valid.reduce((sum,r)=>sum+(selected.has(r.id)?allocations[r.id]:0),0);
- const irrelevant=catalog.filter(r=>!r.isIncidentRelevant&&selected.has(r.id)).length;
+ const irrelevant=catalog.filter(r=>!r.isIncidentRelevant&&!neutralIds.includes(r.id)&&selected.has(r.id)).length;
  return {total:clamp(earned-irrelevant*60,900),maximum:900,allocations,earned,penalty:irrelevant*60};
 }
 export function scoreFinancial(challenge,answers={}) {
@@ -53,7 +68,7 @@ export function finalizeStationScore(record,station) {
  else if(station===2)earned=scoreDesk(decision.items);
  else if(station===3){
   if(!record.station03Experience?.dataChallenge)return false;
-  const investigation=scoreEvidence(record.station03Experience.rows,decision.selectedIds);
+  const investigation=scoreEvidence(record.station03Experience.rows,decision.selectedIds,neutralEvidenceIds(record));
   const financial=scoreFinancial(record.station03Experience.dataChallenge,decision.dataDecisions?.answers);
   earned=investigation.total+financial.totalPoints;components={investigation,financial};
  }else if(station===4){
@@ -63,6 +78,11 @@ export function finalizeStationScore(record,station) {
  }else return false;
  record.scoring ||= {version:SCORE_VERSION,missionId:record.mission.missionId,maximum:5000,stations:{},total:0};
  record.scoring.stations[key]={earned,maximum:MAXIMUMS[key],finalizedAt:decision.completedAt,...(components?{components}:{})};
- record.scoring.total=Object.values(record.scoring.stations).reduce((sum,s)=>sum+s.earned,0);
+ // New missions only (bonus-v1); every historical record keeps its original 5000-point model.
+ if(record.scoreModel==='bonus-v1'){
+  if(station===2&&record.scoring.hiddenBonus===undefined)record.scoring.hiddenBonus=hiddenDeskBonus(decision.items);
+  record.scoring.maximum=5000+HIDDEN_BONUS_MAX;
+ }
+ record.scoring.total=Object.values(record.scoring.stations).reduce((sum,s)=>sum+s.earned,0)+(record.scoring.hiddenBonus||0);
  return true;
 }

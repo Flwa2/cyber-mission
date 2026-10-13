@@ -1,4 +1,4 @@
-﻿import { independentContext, independentMiddleware, scopedTransaction } from '../independentMode.js';
+import { independentContext, independentMiddleware, scopedTransaction } from '../independentMode.js';
 import {leaderboardSnapshot} from '../leaderboard.js';
 import {publicEvents,publicEventLeaderboard} from '../events.js';
 import { finalizeStationScore } from '../progressiveScoring.js';
@@ -89,7 +89,7 @@ router.post('/stations/:station/sync',handle(req=>transaction(s=>{
  if(r&&r.mission.playerName!==m.playerName)fail('Player name cannot change after starting',400);
  if(r?.mission.avatarId!==undefined&&r.mission.avatarId!==m.avatarId)fail('Player avatar cannot change after starting',400);
  if(r && r.originDevice!==deviceId)fail('Mission belongs to another device');
- if(r?.phase==='TIMED_OUT')return {saved:true,resetAt:r.handoffResetAt,missionId:m.missionId,revision:r.revision,mission:publicMission(r)};
+ if(r?.phase==='TIMED_OUT'||r?.phase==='ABANDONED')return {saved:true,resetAt:r.handoffResetAt,missionId:m.missionId,revision:r.revision,mission:publicMission(r)};
  if(r?.phase==='RECOVERY')fail('Mission requires staff recovery');
  if(r?.phase==='DEV_ARCHIVED')fail('Test mission was archived');
  if(r && r.stage!==1) return {saved:true,resetAt:r.handoffResetAt,missionId:m.missionId,revision:r.revision||0,mission:publicMission(r)};
@@ -102,7 +102,7 @@ router.post('/stations/:station/sync',handle(req=>transaction(s=>{
    const e=new Error('A newer mission is saved on the server'); e.status=409;
    e.conflict={mission:publicMission(r),revision:r.revision||0}; throw e;
  }
- r ||= s.missions[m.missionId]={missionId:m.missionId,eventId:s.events?.activeEventId,originDevice:deviceId,stage:1,phase:'ACTIVE',timer:{activeMs:0,activeStartedAt:null}};
+ r ||= s.missions[m.missionId]={missionId:m.missionId,eventId:s.events?.activeEventId,originDevice:deviceId,scoreModel:'bonus-v1',stage:1,phase:'ACTIVE',timer:{activeMs:0,activeStartedAt:null}};
  if(!unchanged)r.revision=(r.revision||0)+1;
  if(!r.timer)r.timer={activeMs:0,activeStartedAt:null};
  r.mission=structuredClone(m);
@@ -152,6 +152,22 @@ router.post('/stations/:station/release',handle(req=>transaction(s=>{
  const r=s.missions[d.missionId];
  if(r&&r.stage===station&&r.phase==='ACTIVE'){pauseMissionTimer(r);r.phase='RECOVERY';}
  release(s,d);return {released:true};
+})));
+// Explicit, confirmed exit. `abandoned` is a deliberate player choice (excluded from every count and
+// ranking, kept for audit) and differs from `timed-out`, which is an expiry of the mission clock.
+router.post('/stations/:station/abandon',handle(req=>transaction(s=>{
+ const {station,deviceId}=input(req),d=slot(s,station);owned(d,deviceId);
+ const r=s.missions[req.body.missionId];
+ if(!r)fail('Mission not found',404);
+ const result=()=>({abandoned:r.phase==='ABANDONED',mission:publicMission(r),revision:r.revision||0,device:d});
+ if(r.phase==='ABANDONED'||['COMPLETED','TIMED_OUT','DEV_ARCHIVED'].includes(r.phase))return result();
+ if(!independentContext.getStore()&&d.missionId!==r.missionId)fail('Station is not assigned to this mission');
+ pauseMissionTimer(r);
+ const at=new Date().toISOString();
+ Object.assign(r,{phase:'ABANDONED',abandonedAt:at,abandonedStation:r.stage,revision:(r.revision||0)+1});
+ r.mission.status='abandoned';r.mission.updatedAt=at;
+ if(d.missionId===r.missionId)release(s,d);
+ return result();
 })));
 router.post('/stations/:station/desk',handle(req=>transaction(s=>{
  const {station,deviceId}=input(req),d=slot(s,station);owned(d,deviceId);

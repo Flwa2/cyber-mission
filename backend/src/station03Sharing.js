@@ -48,8 +48,8 @@ function buildQuestions(timestamp){
    id:'q3-trusted-friend-sharing',
    prompt:text('A trusted friend at another government entity asks for data held by your department on your work computer. How would you share it?','تواصل معك صديق تثق به من جهة حكومية أخرى وسأل عن إمكانية مشاركة بيانات تمتلكها إدارتك في الصندوق وهي موجودة على جهازك، كيف ستشاركها معه؟'),
    context:{
-    sender:text('Ahmed — colleague at another government entity','أحمد — زميل في جهة حكومية أخرى'),
-    from:'ahmed@partner-government.invalid',
+    sender:text('Faisal — colleague at another government entity','فيصل — زميل في جهة حكومية أخرى'),
+    from:'faisal@partner-government.invalid',
     subject:text('A quick question','سؤال سريع'),
     receivedAt:receivedAt(5),
     body:text('Hi, we are working on a related project over here. Could you send me the dataset your department has on your work computer? It would help us move things along.','مرحبًا، نعمل هنا على مشروع ذي صلة. هل يمكنك إرسال مجموعة البيانات الموجودة لدى إدارتكم على جهاز العمل؟ سيساعدنا ذلك على إنجاز العمل.')

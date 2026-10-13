@@ -98,7 +98,7 @@ export default function Station04({mission,onAction,busy=false,error='',onExit})
      <p>{display(mission.station04Result.explanation)}</p>
      <small>{copy('The records identify the account involved; they do not establish malicious intent.','تحدد السجلات الحساب المرتبط بالنشاط، ولا تثبت وجود نية ضارة.')}</small>
     </section>}
-    {mission.finalScore&&<><h2><bdi dir="ltr">{mission.finalScore.total.toLocaleString(language)} / 5,000</bdi></h2><div className="response-options">{Object.values(mission.finalScore.stations).map((score,index)=><div className="response-option" key={index}><span>{copy(`Station 0${index+1}`,`المحطة 0${index+1}`)}</span><strong><bdi dir="ltr">{score.earned} / {score.maximum}</bdi></strong></div>)}</div><button className="response-primary" onClick={onExit}>{copy('BACK TO HOME','العودة للرئيسية')}</button></>}
+    {mission.finalScore&&<><h2><bdi dir="ltr">{mission.finalScore.total.toLocaleString(language)} / {(mission.finalScore.maximum||5000).toLocaleString(language)}</bdi></h2><div className="response-options">{Object.values(mission.finalScore.stations).map((score,index)=><div className="response-option" key={index}><span>{copy(`Station 0${index+1}`,`المحطة 0${index+1}`)}</span><strong><bdi dir="ltr">{score.earned} / {score.maximum}</bdi></strong></div>)}</div><button className="response-primary" onClick={onExit}>{copy('BACK TO HOME','العودة للرئيسية')}</button></>}
    </>:<>
     <p className="response-kicker">{copy(`STEP ${step} OF 3`,`الخطوة ${step} من 3`)}</p>
     <h1 id="response-title" ref={heading} tabIndex={-1}>{title}</h1>

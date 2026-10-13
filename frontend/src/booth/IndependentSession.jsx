@@ -10,7 +10,7 @@ import Station03 from '../stations/Station03/Station03.jsx';
 import Station04 from '../stations/Station04/Station04.jsx';
 
 export default function IndependentSession({setup}){
- const {mission,saveMission,isLoaded,resetMission}=useMission();
+ const {mission,saveMission,isLoaded,resetMission,abandonMission}=useMission();
  const latest=useRef({mission,saveMission});latest.current={mission,saveMission};
  const gate=useRef(false),epoch=useRef(0),published=useRef(null);
  const [busy,setBusy]=useState(false),[error,setError]=useState('');
@@ -44,8 +44,11 @@ export default function IndependentSession({setup}){
   catch(e){if(e.conflict?.mission){saveMission(e.conflict.mission);localStorage.setItem(`cyberMission.independentRevision.${mission.missionId}`,e.conflict.revision);}else setError(e.message);return false;}
   finally{gate.current=false;setBusy(false);}
  }
+ useEffect(()=>{if(mission?.status==='abandoned')resetMission();},[mission?.status]);
  if(!mission?.startedAt)return setup;
- const onExit=resetMission; // Detach this browser only; never erase the saved mission or other players.
+ if(mission.status==='abandoned')return null;
+ // Confirmed exit marks the mission abandoned on the server; refresh or network loss never does.
+ const onExit=abandonMission;
  let content;
  if(mission.status==='timed-out')content=<main className="screen center-screen"><h1>{mission.language==='ar'?'انتهى وقت المهمة':'Mission time expired'}</h1><button className="primary-button" onClick={onExit}>{mission.language==='ar'?'العودة للرئيسية':'Back to Home'}</button></main>;
  else if(mission.currentStation===1)content=<Station01 mission={mission}/>;

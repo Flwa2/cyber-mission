@@ -12,6 +12,7 @@ import {caseCatalog,publicMission} from '../src/caseEngine.js';
 import {financeTemplate} from '../src/station03Cases.js';
 import {ensureStation03Experience} from '../src/station03Experience.js';
 import {initializeVaultAssignment,bindVaultClues} from '../src/station04Vault.js';
+import {applyVaultRule,vaultRule} from '../src/station04VaultRules.js';
 import {createNarrativeAssignment,seededNarrativeRandom} from '../../shared/narrativeAssignment.mjs';
 import {scoreEvidence} from '../src/progressiveScoring.js';
 import {station04Evidence} from '../../frontend/src/stations/Station04/evidence.mjs';
@@ -27,13 +28,14 @@ for(const definition of CASES)for(const digits of [0,7,1048,9999]){
  const legacy=JSON.stringify(baseline);
  initializeVaultAssignment(baseline);bindVaultClues(baseline);
  assert.equal(JSON.stringify(baseline),legacy,'legacy snapshots are not opted in');
- initializeVaultAssignment(record,{newMission:true,random:max=>max===10000?digits:49});
+ initializeVaultAssignment(record,{newMission:true,random:()=>digits});
  const original=structuredClone(record.vaultAssignment);
  initializeVaultAssignment(record,{newMission:true,random:()=>{throw Error('must not reroll');}});
  assert.deepEqual(record.vaultAssignment,original);
- assert.equal(original.code,String(digits).padStart(4,'0'));
- assert.match(original.reviewReference,/^[1-9]\d{5}$/);
- assert.equal(original.reviewReference.slice(-4),original.code);
+ assert.equal(original.contentVersion,2);
+ assert.match(original.code,/^\d{4}$/);
+ assert.match(original.reviewReference,/^\d{4,6}$/);
+ assert.equal(applyVaultRule(original.ruleId,original.reviewReference),original.code);
  ensureStation03Experience(record,caseCatalog(record));
  assert.deepEqual(facts(record.station03Experience.rows),facts(baseline.station03Experience.rows),'only descriptions change');
  const {email,document}=record.vaultAssignment.clueSources;
@@ -41,7 +43,7 @@ for(const definition of CASES)for(const digits of [0,7,1048,9999]){
  assert.equal(record.station03Experience.rows.filter((r,i)=>JSON.stringify(r)!==JSON.stringify(baseline.station03Experience.rows[i])).length,2);
  for(const lang of ['ar','en']){
   assert(document.description[lang].includes(original.reviewReference));
-  assert(email.description[lang].includes(lang==='en'?'first two digits':'أول رقمين'));
+  assert(email.description[lang].includes(vaultRule(original.ruleId)[lang]));
   assert(document.description[lang].startsWith(baseline.station03Experience.rows.find(r=>r.id===document.id).description[lang]));
   const publicState=publicMission(record);
   assert(!JSON.stringify(publicState).includes('vaultAssignment'));

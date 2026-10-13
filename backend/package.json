@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "test": "node scripts/validatePersistence.mjs && node scripts/validateLeaderboard.mjs && node scripts/validateProgressiveScoring.mjs && node scripts/validateBooth.mjs && node scripts/validateLeases.mjs && node scripts/validateInvestigation.mjs && node scripts/validateCases.mjs && node scripts/validateClassification.mjs && node scripts/validateDataSharing.mjs && node scripts/validateStation04.mjs && node scripts/validateStation04Result.mjs && node scripts/validateNarrative.mjs && node scripts/validateEvents.mjs"
+    "test": "node scripts/validatePersistence.mjs && node scripts/validateLeaderboard.mjs && node scripts/validateProgressiveScoring.mjs && node scripts/validateBooth.mjs && node scripts/validateLeases.mjs && node scripts/validateInvestigation.mjs && node scripts/validateCases.mjs && node scripts/validateClassification.mjs && node scripts/validateDataSharing.mjs && node scripts/validateStation04.mjs && node scripts/validateStation04Result.mjs && node scripts/validateNarrative.mjs && node scripts/validateEvents.mjs && node scripts/validateAbandon.mjs && node scripts/validateVaultV2.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

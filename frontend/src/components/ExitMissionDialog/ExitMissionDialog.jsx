@@ -1,10 +1,17 @@
 import { useTranslation } from "../../locales/LanguageProvider.jsx";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export default function ExitMissionDialog({ onCancel, onExit }) {
   const { t, language } = useTranslation();
   const dialogRef = useRef(null);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  async function confirm() {
+    if (busy) return;
+    setBusy(true); setFailed(false);
+    try { await onExit(); } catch { setFailed(true); } finally { setBusy(false); }
+  }
   useEffect(() => {
     const dialog = dialogRef.current;
     const previousFocus = document.activeElement;
@@ -34,14 +41,14 @@ export default function ExitMissionDialog({ onCancel, onExit }) {
   return createPortal(
     <dialog ref={dialogRef} className="exit-mission-dialog" aria-labelledby="exit-title" aria-describedby="exit-description"
       onKeyDown={containKeyboardFocus}
-      onCancel={(event) => { event.preventDefault(); onCancel(); }}>
+      onCancel={(event) => { event.preventDefault(); if (!busy) onCancel(); }}>
       <div className="exit-marker" aria-hidden="true">!</div>
-      <p className="eyebrow">{t("Exit Mission")}</p>
-      <h2 id="exit-title">{t("End current mission?")}</h2>
-      <p id="exit-description">{t("Your current mission progress will be lost.")}</p>
+      <h2 id="exit-title">{t("End participation?")}</h2>
+      <p id="exit-description">{t("If you end your participation now, your result will not be counted among participants and will not appear on the leaderboard. Do you want to continue?")}</p>
+      {failed && <p className="exit-error" role="alert">{t("Could not end participation. Check the connection and try again.")}</p>}
       <div className="exit-dialog-actions">
-        <button type="button" className="exit-cancel" autoFocus onClick={onCancel}>{t("Cancel")}</button>
-        <button type="button" className="exit-confirm" onClick={onExit}>{t("Exit Mission")}</button>
+        <button type="button" className="exit-cancel" autoFocus disabled={busy} onClick={onCancel}>{t("Return to game")}</button>
+        <button type="button" className="exit-confirm" disabled={busy} onClick={confirm}>{t("End participation")}</button>
       </div>
     </dialog>, document.body
   );

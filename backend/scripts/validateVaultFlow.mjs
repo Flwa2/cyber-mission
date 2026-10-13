@@ -36,18 +36,19 @@ for(const definition of CASES){
  assert(publicVault(r).discovery);assert(!publicVault(r).revealedCode);assert.equal(r.vaultState.awardAvailable,600);
  const discovery=r.vaultState.discovery;
  assert(Date.parse(discovery.timestamp)<Date.parse(now),'archive follows historical case events');
- for(const p of r.mission.narrativeAssignment.choices)assert(!discovery.description.en.includes(p.name.en)&&!discovery.description.ar.includes(p.name.ar),'no named answer');
+ assert(!/responsible|culprit|guilty|caused|is the person/i.test(discovery.description.en),'the archive never states a verdict');
+ const pc=r.mission.narrativeAssignment.choices;assert.equal(pc.filter(p=>discovery.description.en.includes(p.name.en)).length,3,'conversation involves exactly the three suspects');
  recordVaultAction(r,{action:'vault-continue',requestId:'continue-request'},later);recordIncidentResponse(r,{action:'begin-response'},later);
  assert.equal(r.mission.decisions.station04.phase,'person');assert.equal(r.mission.startedAt,baseline.startedAt);assert.deepEqual(r.mission.evidence,baseline.evidence);assert.deepEqual(r.mission.decisions.station03,baseline.decisions.station03);assert(!r.scoring);
  const hints=fixture(definition);
  assert.throws(()=>recordVaultAction(hints,{action:'vault-hint',level:3,requestId:'skip-hint-request'}),/next/);
- for(const [level,award] of [[1,500],[2,300],[3,0]]){
+ for(const [level,award] of [[1,500],[2,300],[3,50]]){
   const body={action:'vault-hint',level,requestId:`hint-request-${level}`};recordVaultAction(hints,body,now);const after=JSON.stringify(hints);
   recordVaultAction(hints,body,now);assert.equal(JSON.stringify(hints),after);
   recordVaultAction(hints,{...body,requestId:`repeat-hint-${level}`},now);assert.equal(hints.vaultState.awardAvailable,award);
   assert.equal(Boolean(publicVault(hints).revealedCode),level===3);
  }
- assert.equal(publicVault(hints).revealedCode,'0007');assert(hints.vaultState.unlockedAt);
+ assert.equal(publicVault(hints).revealedCode,hints.vaultAssignment.code);assert(hints.vaultState.unlockedAt);
  const serialized=publicMission(hints);assert(!serialized.vaultAssignment);assert(!serialized.vaultState);assert(!serialized.vault.references.email.metadata);assert(!JSON.stringify(serialized.vault).includes('isIncidentRelevant'));
  const legacy=fixture(definition);delete legacy.vaultAssignment;recordIncidentResponse(legacy,{action:'begin-response'});assert(!publicVault(legacy));
  const inProgress=fixture(definition);inProgress.mission.decisions.station04={version:2,phase:'person'};assert(!publicVault(inProgress),'already-started responses stay legacy');
@@ -80,7 +81,7 @@ try{
  for(const level of [2,3])state=await action({action:'vault-hint',level,requestId:`http-hint-${level}`,revision:state.revision});
  assert.equal(state.mission.vault.revealedCode,'0007');assert(state.mission.vault.discovery);
  state=await action({action:'vault-continue',requestId:'http-continue',revision:state.revision});
- assert.equal(state.mission.decisions.station04.phase,'person');assert.equal(disk().vaultState.awardAvailable,0);assert(!disk().scoring,'no new score finalization in Step 2');
+ assert.equal(state.mission.decisions.station04.phase,'person');assert.equal(disk().vaultState.awardAvailable,50);assert(!disk().scoring,'no new score finalization in Step 2');
  assert.deepEqual(disk().mission.evidence,record.mission.evidence);
  console.log('Vault flow PASS: four cases, both digit sets, no leakage before reveal, hints/cooldown/idempotency, owner/revision enforcement, restart/recovery and unchanged legacy/scoring/evidence.');
 }finally{await stop();}

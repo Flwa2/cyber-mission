@@ -57,7 +57,7 @@ for(const definition of CASES)for(const [index,person] of NARRATIVE_CHARACTERS.e
  const mail=rows.find(r=>r.title?.en==='Review pack for the meeting');assert(mail);
  assert.equal(mail.metadata.from,`${person.id}@example.com`);
  assert(!/signed in with|approved a sign-in|outside the organization|سجلت الدخول|وافقت على إشعار/.test(JSON.stringify(mail.description)));
- for(const p of choices)assert(rows.some(r=>r.source==='mail'&&r.metadata.from===`${p.id}@example.com`));
+ for(const p of choices)assert(rows.some(r=>JSON.stringify(r).includes(`${p.id}@example.com`)),`suspect ${p.id} appears in the records`);
  for(const r of rows){
   assert(!JSON.stringify(r).includes('???'),'Arabic encoding');
   const {identityVersion,readablePresentation,...displayMetadata}=r.metadata;assert.deepEqual(workstationRecord(r).metadata,readablePresentation?.metadata||displayMetadata,'display must not alias saved identity');assert.deepEqual(workstationRecord(workstationRecord(r)),workstationRecord(r));

@@ -22,8 +22,8 @@ export default function MissionTopBar(props) {
 }
 
 function ContextMissionTopBar(props) {
-  const { resetMission } = useMission();
-  return <MissionTopBarView {...props} onExit={resetMission} />;
+  const { abandonMission } = useMission();
+  return <MissionTopBarView {...props} onExit={abandonMission} />;
 }
 
 function MissionTopBarView({ mission, hideIncident = false, onExit, currentStation }) {
@@ -32,7 +32,7 @@ function MissionTopBarView({ mission, hideIncident = false, onExit, currentStati
 
   return (
     <header className="mission-topbar">
-      {currentStation && mission ? <GameplayHud mission={mission} currentStation={currentStation} /> : <>
+      {currentStation && mission ? <GameplayHud mission={mission} currentStation={currentStation} onExit={onExit} /> : <>
       <div className="mission-brand-group">
         <CyberMissionBrand variant="compact" />
         {!hideIncident && <span className="mission-incident-status"><i aria-hidden="true" />{t("ACTIVE INCIDENT")} <span aria-hidden="true">{t("•")}</span> {t("CYBER BREACH")}</span>}

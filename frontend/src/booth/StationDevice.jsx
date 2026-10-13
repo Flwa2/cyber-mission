@@ -52,7 +52,11 @@ export default function StationDevice(){
  }
  async function exitDesk(){
   mutation.current++;
-  try{await stationRequest('release',{missionId:snapshot.mission.missionId,immediate:true});mutation.current++;setSnapshot(await stationRequest('poll'));}catch(e){setError(e.message);}
+  try{
+   const left=await stationRequest('abandon',{missionId:snapshot.mission.missionId}).catch(e=>{if(e.transient)throw e;return null;});
+   if(!left?.abandoned)await stationRequest('release',{missionId:snapshot.mission.missionId,immediate:true});
+   mutation.current++;setSnapshot(await stationRequest('poll'));
+  }catch(e){setError(e.message);throw e;}
  }
  const state=snapshot?.device.state, mission=snapshot?.mission;
  return <LanguageProvider language={mission?.language || new URLSearchParams(location.search).get('lang')}><StationDeviceView {...{state,mission,deskAction,exitDesk,busy,error,complete}}/></LanguageProvider>;

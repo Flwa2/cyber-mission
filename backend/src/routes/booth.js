@@ -102,7 +102,7 @@ router.post('/stations/:station/sync',handle(req=>transaction(s=>{
    const e=new Error('A newer mission is saved on the server'); e.status=409;
    e.conflict={mission:publicMission(r),revision:r.revision||0}; throw e;
  }
- r ||= s.missions[m.missionId]={missionId:m.missionId,eventId:s.events?.activeEventId,originDevice:deviceId,scoreModel:'bonus-v1',stage:1,phase:'ACTIVE',timer:{activeMs:0,activeStartedAt:null}};
+ r ||= s.missions[m.missionId]={missionId:m.missionId,eventId:s.events?.activeEventId,originDevice:deviceId,scoreModel:'fair-v2',stage:1,phase:'ACTIVE',timer:{activeMs:0,activeStartedAt:null}};
  if(!unchanged)r.revision=(r.revision||0)+1;
  if(!r.timer)r.timer={activeMs:0,activeStartedAt:null};
  r.mission=structuredClone(m);

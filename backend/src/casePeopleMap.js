@@ -1,7 +1,7 @@
 import {PEOPLE,text} from '../../shared/casePeople.mjs';
 
 // New-gameplay marker. Missions created before it keep their original content.
-export const usesRefinedContent=record=>record?.scoreModel==='bonus-v1';
+export const usesRefinedContent=record=>record?.scoreModel==='bonus-v1'||record?.scoreModel==='fair-v2';
 
 const office={id:'office',name:text('Office Coordination','تنسيق المكاتب'),role:text('Administration','الشؤون الإدارية')};
 

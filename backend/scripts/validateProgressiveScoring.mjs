@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {scoreMessage,scoreDesk,scoreEvidence,scoreFinancial,scoreResponse,finalizeStationScore} from '../src/progressiveScoring.js';
+import {scoreMessage,scoreDesk,hiddenDeskBonus,scoreEvidence,scoreFinancial,scoreResponse,finalizeStationScore} from '../src/progressiveScoring.js';
 import {SMS_SCENARIOS} from '../../frontend/src/data/smsScenarios.js';
 import {CASES} from '../src/caseDefinitions.js';
 import {caseCatalog,publicMission} from '../src/caseEngine.js';
@@ -50,6 +50,40 @@ const correct={version:2,associatedPersonSelection:'person',firstResponseSelecti
 assert.equal(scoreResponse(correct,{associatedPersonId:'person'}).total,1500);
 assert.equal(scoreResponse({...correct,firstResponseSelection:'investigate_myself'},{associatedPersonId:'person'}).total,1200);
 assert.equal(scoreResponse({...correct,associatedPersonSelection:'wrong',firstResponseSelection:'delete_suspicious_content',evidenceHandlingSelection:'delete_evidence'},{associatedPersonId:'person'}).total,0);
+// fair-v2 (new missions): Station 01 is decided by the final action only.
+for(const scenario of SMS_SCENARIOS){
+ const phishing=scenario.classification==='phishing',F='fair-v2';
+ const table=phishing?{report:1000,continue:100,block:700,delete:500,openLink:0}:{report:200,continue:1000,block:150,delete:100,openLink:0};
+ for(const [finalAction,points] of Object.entries(table)){
+  assert.equal(scoreMessage({scenarioId:scenario.id,finalAction},F),points,'no inspection needed');
+  assert.equal(scoreMessage({scenarioId:scenario.id,finalAction,senderInspected:true,messageDetailsViewed:true,linkInspected:true},F),points,'inspection never changes score');
+ }
+ if(phishing)for(const finalAction of ['report','block','delete','continue'])assert.equal(scoreMessage({scenarioId:scenario.id,finalAction,linkOpened:true},F),0,'opened phishing link always scores 0');
+ assert.equal(scoreMessage({scenarioId:scenario.id,finalAction:phishing?'report':'continue'}),700,'legacy model unchanged without inspection');
+}
+// fair-v2 Station 02: base by distinct correct actions, bonus beyond three, unsafe penalties.
+{
+ const F='fair-v2',ids=['usb','badge','documents','cable','qr','power'];
+ const withSafe=n=>Object.fromEntries(ids.slice(0,n).map(id=>[id,{actionId:id==='documents'?'secure':'report'}]));
+ assert.deepEqual([0,1,2,3,4,5,6].map(n=>scoreDesk(withSafe(n),F)),[0,350,700,1000,1000,1000,1000]);
+ assert.deepEqual([0,1,2,3,4,5,6].map(n=>hiddenDeskBonus(withSafe(n))),[0,0,0,0,50,100,150]);
+ assert.equal(scoreDesk({...withSafe(3),usb:{actionId:'connect'}},F),500,'usb replaced by unsafe: 2 correct = 700, minus 200');
+ assert.equal(scoreDesk({badge:{actionId:'report'},documents:{actionId:'secure'},cable:{actionId:'report'},usb:{actionId:'connect'}},F),800,'3 correct (1000) - usb 200');
+ assert.equal(scoreDesk({...withSafe(6),power:{actionId:'use'}},F),900,'5 correct = 1000, minus 100');
+ assert.equal(scoreDesk({usb:{actionId:'connect'}},F),0,'floor at 0');
+ assert.equal(scoreDesk({usb:{actionId:'leave'},badge:{actionId:'leave'}},F),0,'leave is neither correct nor penalised');
+ assert.equal(scoreDesk({...withSafe(5),power:{actionId:'use'}},F),900);
+ assert.equal(hiddenDeskBonus({...withSafe(5),power:{actionId:'use'}}),100,'unsafe action never counts toward bonus');
+ assert.equal(hiddenDeskBonus({usb:{actionId:'report'},badge:{actionId:'report'},documents:{actionId:'secure'},cable:{actionId:'report'},qr:{actionId:'scan'},power:{actionId:'use'}}),50);
+ // legacy desk scoring is unchanged
+ assert.equal(scoreDesk(withSafe(1)),200);assert.equal(scoreDesk({...withSafe(6),usb:{actionId:'leave'}}),920);
+ // model isolation: only fair-v2 records use the new rules; bonus-v1 and legacy keep theirs, 5150 vs 5000 maxima.
+ const mk=model=>({...(model?{scoreModel:model}:{}),mission:{missionId:'CM-ISO',decisions:{station01:{scenarioId:'SMS-PHISH-001',finalAction:'report',completedAt:now},station02:{items:withSafe(6),completedAt:now}}}});
+ const out=Object.fromEntries(['fair-v2','bonus-v1',undefined].map(m=>{const r=mk(m);finalizeStationScore(r,2);return [m,r.scoring];}));
+ assert.equal(out['fair-v2'].stations.station01.earned,1000);assert.equal(out['fair-v2'].stations.station02.earned,1000);assert.equal(out['fair-v2'].total,2150);assert.equal(out['fair-v2'].maximum,5150);
+ assert.equal(out['bonus-v1'].stations.station01.earned,700);assert.equal(out['bonus-v1'].total,1850);assert.equal(out['bonus-v1'].maximum,5150);
+ assert.equal(out['undefined'].stations.station01.earned,700);assert.equal(out['undefined'].total,1700);assert.equal(out['undefined'].maximum,5000);
+}
 const uncompleted={mission:{missionId:'CM-SCORE1',decisions:{station01:{scenarioId:SMS_SCENARIOS[0].id}}}};
 assert.equal(finalizeStationScore(uncompleted,1),false);
 uncompleted.mission.decisions.station01.completedAt=now;uncompleted.mission.status='timed-out';assert.equal(finalizeStationScore(uncompleted,1),false);
@@ -70,24 +104,24 @@ try{
  await start();let result=await api(1,'sync',{mission,revision:0,pauseTimer:true});assert(!disk().scoring);
  // A later snapshot cannot erase a recorded unsafe action; client totals are ignored.
  mission.decisions.station01.linkOpened=false;mission.decisions.station01.finalAction='report';mission.decisions.station01.completedAt=now;
- result=await api(1,'sync',{mission,revision:result.revision,pauseTimer:true});assert.equal(disk().scoring.total,600);assert.equal(disk().mission.decisions.station01.linkOpened,true);
- await checkLeaderboard(600,1);const original=disk().scoring;await api(1,'sync',{mission,revision:0,pauseTimer:true});assert.deepEqual(disk().scoring,original);
+ result=await api(1,'sync',{mission,revision:result.revision,pauseTimer:true}); assert.equal(disk().scoring.total,0);assert.equal(disk().mission.decisions.station01.linkOpened,true);
+  await checkLeaderboard(0,1);const original=disk().scoring;await api(1,'sync',{mission,revision:0,pauseTimer:true});assert.deepEqual(disk().scoring,original);
  result=await claim(2);
  for(const objectId of Object.keys(safe))result=await api(2,'desk',{objectId,actionId:'report',revision:result.revision});
- assert.equal(disk().scoring.total,600);
- result=await api(2,'desk',{complete:true,revision:result.revision});assert.equal(disk().scoring.total,1750);
- await api(2,'desk',{complete:true,revision:0});assert.equal(disk().scoring.total,1750);
- await checkLeaderboard(1750,2);result=await claim(3);const rows=disk().station03Experience.rows;
+ assert.equal(disk().scoring.total,0);
+ result=await api(2,'desk',{complete:true,revision:result.revision});assert.equal(disk().scoring.total,1150);
+ await api(2,'desk',{complete:true,revision:0});assert.equal(disk().scoring.total,1150);
+ await checkLeaderboard(1150,2);result=await claim(3);const rows=disk().station03Experience.rows;
  for(const row of rows.filter(x=>x.isIncidentRelevant)){
   result=await api(3,'investigation',{action:'inspect',itemId:row.id,revision:result.revision});
   result=await api(3,'investigation',{action:'add',itemId:row.id,revision:result.revision});
  }
  result=await api(3,'investigation',{action:'begin-classification',revision:result.revision});
  for(const q of disk().station03Experience.dataChallenge.questions)result=await api(3,'investigation',{action:'answer',itemId:q.id,selectedClassification:q.expectedAnswer,revision:result.revision});
- assert.equal(disk().scoring.total,1750);
- result=await api(3,'investigation',{action:'complete',revision:result.revision});assert.equal(disk().scoring.total,3250);
- await api(3,'investigation',{action:'complete',revision:0});assert.equal(disk().scoring.total,3250);
- await checkLeaderboard(3250,3);const saved=JSON.stringify(disk().scoring);await stop();await start();assert.equal(JSON.stringify(disk().scoring),saved);
+ assert.equal(disk().scoring.total,1150);
+ result=await api(3,'investigation',{action:'complete',revision:result.revision});assert.equal(disk().scoring.total,2650);
+ await api(3,'investigation',{action:'complete',revision:0});assert.equal(disk().scoring.total,2650);
+ await checkLeaderboard(2650,3);const saved=JSON.stringify(disk().scoring);await stop();await start();assert.equal(JSON.stringify(disk().scoring),saved);
  result=await claim(4);
  if(disk().vaultAssignment){
   result=await api(4,'resolution',{action:'vault-attempt',code:disk().vaultAssignment.code,requestId:'scoring-vault-open',revision:result.revision});
@@ -97,16 +131,16 @@ try{
   result=await api(4,'resolution',{action:'select-response',phase,selection,revision:result.revision});
   if(phase!=='evidence')result=await api(4,'resolution',{action:'advance-response',revision:result.revision});
  }
- result=await api(4,'resolution',{action:'submit-response',revision:result.revision});assert.equal(disk().scoring.total,4750);assert.equal(disk().mission.decisions.station04.privateScore.total,1500);
- await checkLeaderboard(4750,4);const final=disk();await api(4,'resolution',{action:'submit-response',revision:0});assert.deepEqual(disk().scoring,final.scoring);
- await stop();await start();await checkLeaderboard(4750,4);assert.deepEqual(disk().scoring,final.scoring);assert.equal(disk().mission.decisions.station04.completedAt,final.mission.decisions.station04.completedAt);
+ result=await api(4,'resolution',{action:'submit-response',revision:result.revision}); assert.equal(disk().scoring.total,4150);assert.equal(disk().mission.decisions.station04.privateScore.total,1500);
+  await checkLeaderboard(4150,4);const final=disk();await api(4,'resolution',{action:'submit-response',revision:0});assert.deepEqual(disk().scoring,final.scoring);
+ await stop();await start();await checkLeaderboard(4150,4);assert.deepEqual(disk().scoring,final.scoring);assert.equal(disk().mission.decisions.station04.completedAt,final.mission.decisions.station04.completedAt);
  assert.equal(final.mission.startedAt,now);assert.equal(final.mission.missionId,mission.missionId);assert.equal(final.scoring.maximum,5150);assert.equal(Object.keys(final.scoring.stations).length,4);
  assert(!JSON.stringify(publicMission(final)).includes('action-5000-v1'));
  // A safe, otherwise identical final run reaches exactly the approved maximum.
  const perfect=structuredClone(final);delete perfect.scoring;perfect.mission.decisions.station01.linkOpened=false;
  for(let station=1;station<=4;station++)assert(finalizeStationScore(perfect,station));
  assert.equal(perfect.scoring.total,5150);assert.equal(perfect.scoring.maximum,5150);{const old=structuredClone(perfect);delete old.scoring;delete old.scoreModel;for(let station=1;station<=4;station++)finalizeStationScore(old,station);assert.equal(old.scoring.total,5000,'historical model unchanged');assert.equal(old.scoring.maximum,5000);assert.equal(old.scoring.hiddenBonus,undefined);}for(let station=1;station<=4;station++)assert.equal(finalizeStationScore(perfect,station),false);
- const resumed=structuredClone(final);delete resumed.scoring;assert(finalizeStationScore(resumed,4));assert.equal(resumed.scoring.total,4750,'older completed decisions recovered at next boundary');
+ const resumed=structuredClone(final);delete resumed.scoring;assert(finalizeStationScore(resumed,4));assert.equal(resumed.scoring.total,4150,'older completed decisions recovered at next boundary');
  const timed=structuredClone(final);delete timed.scoring.stations.station04;timed.scoring.total=3100;timed.mission.status='timed-out';
  const beforeTimeout=JSON.stringify(timed.scoring);assert.equal(finalizeStationScore(timed,4),false);assert.equal(JSON.stringify(timed.scoring),beforeTimeout);
  const ledger=JSON.stringify(final.scoring);final.mission.hiddenScore=-999999;final.mission.decisions.station04.privateScore.total=999999;

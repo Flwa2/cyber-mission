@@ -62,9 +62,30 @@ export function simplifyInvestigationCopy(rows,mapped){
  }
  const directory=rows.find(r=>r.id==='case:directory');
  if(directory)directory.description=text(
-  'Review team contacts\n'+mapped.map(p=>`${p.person.name.en} / ${p.person.role.en} / ${computers[p.device].en} / ${p.person.id}@example.com`).join('\n'),
-  'جهات التواصل لفريق المراجعة\n'+mapped.map(p=>`${p.person.name.ar} / ${p.person.role.ar} / ${computers[p.device].ar} / ${p.person.id}@example.com`).join('\n')
+  'Review team contacts\nName / Department / Assigned computer / Work account\n'+mapped.map(p=>`${p.person.name.en} / ${p.person.role.en} / ${computers[p.device].en} / ${accounts[p.device].en} (${p.person.id}@example.com)`).join('\n'),
+  'جهات التواصل لفريق المراجعة\nالاسم / القسم / الجهاز المخصص / حساب العمل\n'+mapped.map(p=>`${p.person.name.ar} / ${p.person.role.ar} / ${computers[p.device].ar} / ${accounts[p.device].ar} (${p.person.id}@example.com)`).join('\n')
  );
+ // Titles only: source labels and copy/computer qualifiers; IDs and relevance are untouched.
+ const retitle=(id,en,ar)=>{const row=rows.find(r=>r.id===id);if(row)row.title=text(en,ar);};
+ for(const row of rows){
+  const computer=computers[row.metadata?.device];
+  if(/:signin$|^finance:sign-in$/.test(row.id)&&computer)row.title=text(`Work session started — ${computer.en}`,`بدء جلسة العمل — ${computer.ar}`);
+  if(row.source==='mail'&&row.title?.en==='Invoice 1048 — revised copy')row.title=text('Email: Invoice 1048 revised copy','بريد: نسخة معدلة من الفاتورة 1048');
+ }
+ if(rows.some(r=>r.id==='case:identity')){
+  if(rows.find(r=>r.id==='case:file')?.title==='Site_Contacts.pdf')retitle('case:file','Site_Contacts.pdf (downloaded copy)','Site_Contacts.pdf (نسخة منزّلة)');
+  if(rows.find(r=>r.id==='case:deleted')?.title==='Site_Contacts.pdf')retitle('case:deleted','Site_Contacts.pdf (deleted copy)','Site_Contacts.pdf (نسخة محذوفة)');
+ }
+ if(rows.some(r=>r.id==='finance:sharing-mail')){
+  retitle('case:share','Activity log: external sharing link created','سجل النشاط: إنشاء رابط مشاركة خارجي');
+  retitle('finance:sharing-mail','Notification: sharing link for Payments_Oct.xlsx','إشعار: رابط مشاركة للملف Payments_Oct.xlsx');
+  retitle('finance:recent-delete','Recent activity: Receipt_06.pdf moved to Recycle Bin','النشاط الأخير: نقل Receipt_06.pdf إلى سلة المحذوفات');
+  retitle('finance:recent-export','Recent activity: Payments_Oct.xlsx saved','النشاط الأخير: حفظ Payments_Oct.xlsx');
+  const exportRow=rows.find(r=>r.id==='finance:recent-export');
+  if(exportRow?.description?.en)exportRow.description=text(exportRow.description.en.replace(/ Reference Payments_Oct\.xlsx\./,''),exportRow.description.ar.replace(/، بالمرجع Payments_Oct\.xlsx/,''));
+ }
+ const delivery=rows.find(r=>r.id==='case:delivery');
+ if(delivery?.title?.en==='Project_Sept.zip received')delivery.title=text('Delivery notice: Project_Sept.zip received','إشعار تسليم: تم استلام Project_Sept.zip');
  const rewrite=(id,en,ar)=>{const row=rows.find(r=>r.id===id);if(row)row.description=text(en,ar);};
  rewrite('case:upload',
   'A copy of Project_Sept.zip was shared outside the organization from the project review computer. The receiving service was separate from the internal planning folder.',

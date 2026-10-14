@@ -4,16 +4,32 @@ import {ACTIVE_SMS_SCENARIOS} from '../../frontend/src/data/activeSmsScenarios.j
 export const SCORE_VERSION = 'action-5000-v1';
 export const MAXIMUMS = {station01:1000,station02:1000,station03:1500,station04:1500};
 const clamp=(n,max)=>Math.max(0,Math.min(max,Math.round(n)));
-export function scoreMessage(s={}) {
+// 'fair-v2' (new missions only) keeps every bonus-v1 behaviour and adds the decision-focused Station 01/02 rules.
+export const FAIR_MODEL='fair-v2';
+export const hasBonusModel=record=>record?.scoreModel==='bonus-v1'||record?.scoreModel===FAIR_MODEL;
+export function scoreMessage(s={},model) {
  const catalog=s.catalogVersion==='v2'?ACTIVE_SMS_SCENARIOS:LEGACY_SMS_SCENARIOS;
  const scenario=catalog.find(row=>row.id===s.scenarioId)||ACTIVE_SMS_SCENARIOS.find(row=>row.id===s.scenarioId);
  if(!scenario)return 0;
+ if(model===FAIR_MODEL){
+  const phishing=scenario.classification==='phishing';
+  if(phishing&&(s.linkOpened===true||s.finalAction==='openLink'))return 0;
+  const table=phishing?{report:1000,continue:100,block:700,delete:500,openLink:0}:{report:200,continue:1000,block:150,delete:100,openLink:0};
+  return clamp(table[s.finalAction]??0,1000);
+ }
  const inspection=(s.senderInspected===true?100:0)+(s.messageDetailsViewed===true?100:0)+((scenario.link.exists?s.linkInspected===true:s.messageDetailsViewed===true)?100:0);
  const actions=scenario.classification==='phishing'?{report:700,block:350,delete:200,continue:100,openLink:0}:{continue:700,openLink:0,delete:100,block:150,report:100};
  const unsafe=scenario.classification==='phishing'&&(s.linkOpened===true||s.finalAction==='openLink');
  return clamp(inspection+(actions[s.finalAction]??0)-(unsafe?400:0),1000);
 }
-export function scoreDesk(items={}) {
+const UNSAFE_DESK_PENALTY={usb:{connect:200},badge:{use:200},documents:{read:150},cable:{connect:150},qr:{scan:150},power:{use:100}};
+const FAIR_DESK_BASE=[0,350,700,1000,1000,1000,1000];
+export function scoreDesk(items={},model) {
+ if(model===FAIR_MODEL){
+  const correct=deskCorrectCount(items);
+  const penalty=Object.entries(UNSAFE_DESK_PENALTY).reduce((sum,[id,options])=>sum+(options[items[id]?.actionId]??0),0);
+  return clamp(FAIR_DESK_BASE[correct]-penalty,1000);
+ }
  const allocations={usb:{report:200,leave:120,connect:-200},badge:{report:200,leave:40,use:-200},documents:{secure:200,report:200,leave:20,read:-150},cable:{report:150,leave:105,connect:-150},qr:{report:150,leave:105,scan:-150},power:{report:100,leave:70,use:-100}};
  return clamp(Object.entries(allocations).reduce((sum,[id,options])=>sum+(options[items[id]?.actionId]??0),0),1000);
 }
@@ -21,13 +37,14 @@ export function scoreDesk(items={}) {
 // It only ever feeds the overall total and ranking; it is never part of a station score or a public breakdown.
 const SAFE_DESK_ACTIONS={usb:["report"],badge:["report"],documents:["secure","report"],cable:["report"],qr:["report"],power:["report"]};
 export const HIDDEN_BONUS_MAX=150;
+function deskCorrectCount(items={}){return Object.entries(SAFE_DESK_ACTIONS).filter(([id,safe])=>safe.includes(items[id]?.actionId)).length;}
 export function hiddenDeskBonus(items={}) {
- const correct=Object.entries(SAFE_DESK_ACTIONS).filter(([id,safe])=>safe.includes(items[id]?.actionId)).length;
+ const correct=deskCorrectCount(items);
  return correct>=6?150:correct===5?100:correct===4?50:0;
 }
 // Supporting records for the incident or the vault reference. Selecting them is neither rewarded nor penalised.
 export function neutralEvidenceIds(record){
- if(record?.scoreModel!=='bonus-v1')return [];
+ if(!hasBonusModel(record))return [];
  const d=record.caseAssignment?.definition;
  if(!d)return [];
  return d.id==='case-03'?['finance:review-mail','case:export','finance:sharing-mail','finance:recent-export','finance:recent-delete']:[`case:${d.personId}:mail`,'case:reem:document'];
@@ -64,8 +81,8 @@ export function finalizeStationScore(record,station) {
  // Only recorded completion/answer data is used; no history is fabricated.
  for(let prior=1;prior<station;prior++)finalizeStationScore(record,prior);
  let earned,components;
- if(station===1)earned=scoreMessage(decision);
- else if(station===2)earned=scoreDesk(decision.items);
+ if(station===1)earned=scoreMessage(decision,record.scoreModel);
+ else if(station===2)earned=scoreDesk(decision.items,record.scoreModel);
  else if(station===3){
   if(!record.station03Experience?.dataChallenge)return false;
   const investigation=scoreEvidence(record.station03Experience.rows,decision.selectedIds,neutralEvidenceIds(record));
@@ -79,7 +96,7 @@ export function finalizeStationScore(record,station) {
  record.scoring ||= {version:SCORE_VERSION,missionId:record.mission.missionId,maximum:5000,stations:{},total:0};
  record.scoring.stations[key]={earned,maximum:MAXIMUMS[key],finalizedAt:decision.completedAt,...(components?{components}:{})};
  // New missions only (bonus-v1); every historical record keeps its original 5000-point model.
- if(record.scoreModel==='bonus-v1'){
+ if(hasBonusModel(record)){
   if(station===2&&record.scoring.hiddenBonus===undefined)record.scoring.hiddenBonus=hiddenDeskBonus(decision.items);
   record.scoring.maximum=5000+HIDDEN_BONUS_MAX;
  }
